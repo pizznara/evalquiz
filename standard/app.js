@@ -40,7 +40,7 @@ function labelBgColor(_key) {
   return "#ffffff";
 }
 
-// 枠の色だけで3段階差をつける
+// 枠の色だけで3段階差をつける（あなたが貼ってくれた色）
 function labelBorderColor(key) {
   const info = getLabelInfo(key);
   if (!info) return "#cccccc";
@@ -257,7 +257,8 @@ function renderResult(questions, answers) {
     }
 
     const userLabelText = userInfo ? userInfo.label : "未回答";
-    const correctBaseLabel = correctInfo ? correctInfo.key : correctKey; // ← レンジなしラベル
+    // 正解側は「互角」「先手有利」などレンジなしで表示
+    const correctBaseLabel = correctInfo ? correctInfo.key : correctKey;
 
     html += `
       <div style="margin-bottom:8px;border:1px solid #eee;padding:8px 8px 8px 10px;
@@ -323,7 +324,7 @@ function renderResult(questions, answers) {
   // もう一度挑戦する
   const retryBtn = document.getElementById("retryBtn");
   retryBtn.addEventListener("click", () => {
-    start(); // 新しく出題し直す
+    start(); // 新しい問題で再スタート
   });
 }
 
