@@ -3,12 +3,11 @@ const MANIFEST_URL = "../data/manifest.json";
 /**
  * 7段階ラベル情報
  *  - key: 内部キー
- *  - label: 質問画面での表示（レンジ付き）
+ *  - label: 表示用テキスト（帯付き）
  *  - side: "neg" | "zero" | "pos"
  *  - level: 0,1,2,3（段階）
  *
- *  表示順（上→下）:
- *   先手大優勢 → 先手優勢 → 先手有利 → 互角 → 先手不利 → 先手劣勢 → 先手大劣勢
+ *  ※表示順：大優勢（一番上）〜大劣勢（一番下）
  */
 const LABEL_INFO = [
   { key: "先手大優勢", label: "先手大優勢（+1600以上）",    side: "pos",  level: 3 },
@@ -35,33 +34,53 @@ function getLabelInfo(key) {
   return LABEL_INFO.find(l => l.key === key);
 }
 
-// 背景色：全部同じ（白）
-function labelBgColor(_key) {
-  return "#ffffff";
+// 背景色
+function labelBgColor(key) {
+  const info = getLabelInfo(key);
+  if (!info) return "#dddddd";
+
+  if (info.side === "zero") {
+    return "#eeeeee";
+  }
+  if (info.side === "neg") {
+    if (info.level === 1) return "#e8f0ff"; // 不利（薄い青）
+    if (info.level === 2) return "#c3d4ff"; // 劣勢
+    return "#7999ff";                      // 大劣勢（濃い青）
+  }
+  if (info.side === "pos") {
+    if (info.level === 1) return "#ffecec"; // 有利（薄い赤）
+    if (info.level === 2) return "#ffb7b7"; // 優勢
+    return "#e85b5b";                      // 大優勢（濃い赤）
+  }
+  return "#dddddd";
 }
 
-// 枠の色だけで3段階差をつける
+// 枠の色（視認性UP用）
 function labelBorderColor(key) {
   const info = getLabelInfo(key);
   if (!info) return "#cccccc";
 
-  if (info.side === "zero") return "#888888";
+  if (info.side === "zero") return "#999999";
 
   if (info.side === "neg") {
-    if (info.level === 1) return "#6b8cff"; // 不利
-    if (info.level === 2) return "#3f66e0"; // 劣勢
-    return "#253e99";                       // 大劣勢
+    if (info.level === 1) return "#7999ff";
+    if (info.level === 2) return "#4d6fe3";
+    return "#2c49a8";
   }
   if (info.side === "pos") {
-    if (info.level === 1) return "#ff7b7b"; // 有利
-    if (info.level === 2) return "#e84545"; // 優勢
-    return "#b51414";                       // 大優勢
+    if (info.level === 1) return "#ff7a7a";
+    if (info.level === 2) return "#e85b5b";
+    return "#b52f2f";
   }
   return "#cccccc";
 }
 
-// 文字色：共通
-function labelTextColor(_key) {
+// 文字色（背景が濃いときは白）
+function labelTextColor(key) {
+  const bg = labelBgColor(key);
+  // 超ざっくり判定（R成分で判定）
+  const r = parseInt(bg.slice(1, 3), 16);
+  if (r < 150) return "#ffffff";
   return "#222222";
 }
 
@@ -168,7 +187,7 @@ function renderQuiz(questions) {
       btns.appendChild(b);
     });
 
-    // 戻るボタンのみ（スキップなし）
+    // 戻るボタン
     const prevBtn = document.getElementById("prevBtn");
     prevBtn.onclick = () => {
       if (idx > 0) {
@@ -226,7 +245,6 @@ function renderResult(questions, answers) {
     const userInfo = getLabelInfo(userKey);
     const correctInfo = getLabelInfo(correctKey);
 
-    // ◯×色
     let mark = "×";
     let color = "#cc0000";
     if (userKey === "未回答") {
@@ -241,7 +259,7 @@ function renderResult(questions, answers) {
     }
 
     const userLabelText = userInfo ? userInfo.label : "未回答";
-    const correctBaseLabel = correctInfo ? correctInfo.key : correctKey; // ← レンジ抜きのラベル
+    const correctLabelText = correctInfo ? correctInfo.label : correctKey;
 
     html += `
       <div style="margin-bottom:8px;border:1px solid #eee;padding:8px 8px 8px 10px;
@@ -263,7 +281,7 @@ function renderResult(questions, answers) {
               <span style="color:${color};">${userLabelText}</span>
             </div>
             <div>
-              <b>正解：</b>${correctBaseLabel}
+              <b>正解：</b>${correctLabelText}
               &emsp;AI評価値：${formatCp(q.aiCp)}
             </div>
           </div>
