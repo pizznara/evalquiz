@@ -40,7 +40,7 @@ function labelBgColor(_key) {
   return "#ffffff";
 }
 
-// 枠の色だけで3段階差をつける（あなたが貼ってくれた色）
+// 枠の色だけで3段階差をつける
 function labelBorderColor(key) {
   const info = getLabelInfo(key);
   if (!info) return "#cccccc";
@@ -214,26 +214,10 @@ function renderResult(questions, answers) {
   }
 
   let html = `
-    <div style="
-      margin-bottom:14px;
-      padding:10px 12px;
-      border-radius:12px;
-      background:linear-gradient(135deg,#ffe08a,#ffb3b3);
-      color:#333;
-    ">
-      <div style="font-size:18px;font-weight:bold;margin-bottom:4px;">結果</div>
-      <div style="font-size:13px;margin-bottom:2px;">
-        <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:#ffffffaa;font-weight:bold;">
-          精度スコア：${score.toFixed(1)} / ${questions.length} 点
-        </span>
-      </div>
-      <div style="font-size:13px;">
-        <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:#ffffffaa;font-weight:bold;">
-          傾向：${tendency}
-        </span>
-      </div>
-    </div>
-    <h3 style="font-size:15px;margin:0 0 8px;">各問の結果（クリックで盤面拡大）</h3>
+    <h2 style="font-size:18px;margin-bottom:4px;">結果</h2>
+    <p style="margin:4px 0;">精度スコア：${score.toFixed(1)} / ${questions.length} 点</p>
+    <p style="margin:4px 0 10px;">傾向：${tendency}</p>
+    <h3 style="font-size:15px;margin:14px 0 8px;">各問の結果（クリックで盤面拡大）</h3>
   `;
 
   questions.forEach((q, i) => {
@@ -257,8 +241,7 @@ function renderResult(questions, answers) {
     }
 
     const userLabelText = userInfo ? userInfo.label : "未回答";
-    // 正解側は「互角」「先手有利」などレンジなしで表示
-    const correctBaseLabel = correctInfo ? correctInfo.key : correctKey;
+    const correctBaseLabel = correctInfo ? correctInfo.key : correctKey; // ← レンジ抜きのラベル
 
     html += `
       <div style="margin-bottom:8px;border:1px solid #eee;padding:8px 8px 8px 10px;
@@ -293,13 +276,6 @@ function renderResult(questions, answers) {
     <div style="margin-top:12px;font-size:12px;color:#777;">
       ※ 画像をクリックすると、その場で拡大・縮小できます。
     </div>
-    <div style="margin-top:16px;text-align:center;">
-      <button id="retryBtn"
-        style="padding:8px 16px;border-radius:999px;border:none;
-               background:#4b8fff;color:#fff;font-size:13px;cursor:pointer;">
-        もう一度挑戦する
-      </button>
-    </div>
   `;
 
   app.innerHTML = html;
@@ -320,24 +296,12 @@ function renderResult(questions, answers) {
       }
     });
   });
-
-  // もう一度挑戦する
-  const retryBtn = document.getElementById("retryBtn");
-  retryBtn.addEventListener("click", () => {
-    start(); // 新しい問題で再スタート
-  });
-}
-
-// 起動用ラッパー
-function start() {
-  document.getElementById("app").textContent = "読み込み中…";
-  loadQuestions()
-    .then(renderQuiz)
-    .catch(err => {
-      document.getElementById("app").textContent = "読み込みエラー：" + err;
-      console.error(err);
-    });
 }
 
 // 起動
-start();
+loadQuestions()
+  .then(renderQuiz)
+  .catch(err => {
+    document.getElementById("app").textContent = "読み込みエラー：" + err;
+    console.error(err);
+  });
