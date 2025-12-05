@@ -2,22 +2,24 @@ const MANIFEST_URL = "../data/manifest.json";
 
 /**
  * 7段階ラベル情報
- * - key: 内部処理用のキー
- * - label: 表示用ラベル（帯付き）
- * - side: "neg"（不利側） / "zero" / "pos"
- * - level: 1,2,3（数字が大きいほど“強い”側）
+ *  - key: 内部キー
+ *  - label: 表示用テキスト（帯付き）
+ *  - side: "neg" | "zero" | "pos"
+ *  - level: 0,1,2,3（段階）
+ *
+ *  ※表示順：大優勢（一番上）〜大劣勢（一番下）
  */
 const LABEL_INFO = [
-  { key: "先手大劣勢", label: "先手大劣勢（-1600以下）",      side: "neg",  level: 3 },
-  { key: "先手劣勢",   label: "先手劣勢（-1399〜-900）",     side: "neg",  level: 2 },
-  { key: "先手不利",   label: "先手不利（-799〜-400）",      side: "neg",  level: 1 },
-  { key: "互角",       label: "互角（±299以内）",             side: "zero", level: 0 },
-  { key: "先手有利",   label: "先手有利（+400〜+799）",      side: "pos",  level: 1 },
-  { key: "先手優勢",   label: "先手優勢（+900〜+1399）",     side: "pos",  level: 2 },
-  { key: "先手大優勢", label: "先手大優勢（+1600以上）",     side: "pos",  level: 3 },
+  { key: "先手大優勢", label: "先手大優勢（+1600以上）",    side: "pos",  level: 3 },
+  { key: "先手優勢",   label: "先手優勢（+900〜+1399）",   side: "pos",  level: 2 },
+  { key: "先手有利",   label: "先手有利（+400〜+799）",    side: "pos",  level: 1 },
+  { key: "互角",       label: "互角（±299以内）",           side: "zero", level: 0 },
+  { key: "先手不利",   label: "先手不利（-799〜-400）",    side: "neg",  level: 1 },
+  { key: "先手劣勢",   label: "先手劣勢（-1399〜-900）",   side: "neg",  level: 2 },
+  { key: "先手大劣勢", label: "先手大劣勢（-1600以下）",  side: "neg",  level: 3 },
 ];
 
-// 採点用：キーを段階スコアにマッピング
+// 段階スコア（採点用）
 const IDX = {
   "先手大劣勢": -3,
   "先手劣勢":   -2,
@@ -28,35 +30,58 @@ const IDX = {
   "先手大優勢":  3,
 };
 
-// ラベル情報を key から取得
 function getLabelInfo(key) {
   return LABEL_INFO.find(l => l.key === key);
 }
 
-// 色（棋風診断っぽいトーンで、段階ごとに濃く）
-function labelColor(key) {
+// 背景色
+function labelBgColor(key) {
   const info = getLabelInfo(key);
-  if (!info) return "#888888";
+  if (!info) return "#dddddd";
 
   if (info.side === "zero") {
-    return "#777777";
+    return "#eeeeee";
   }
-
-  // 不利側：青系（レベル1→薄、3→濃）
   if (info.side === "neg") {
-    if (info.level === 1) return "#c3d4ff";
-    if (info.level === 2) return "#7999ff";
-    return "#3257d8";
+    if (info.level === 1) return "#e8f0ff"; // 不利（薄い青）
+    if (info.level === 2) return "#c3d4ff"; // 劣勢
+    return "#7999ff";                      // 大劣勢（濃い青）
   }
-
-  // 有利側：赤系（レベル1→薄、3→濃）
   if (info.side === "pos") {
-    if (info.level === 1) return "#ffb7b7";
-    if (info.level === 2) return "#ff7a7a";
-    return "#e33636";
+    if (info.level === 1) return "#ffecec"; // 有利（薄い赤）
+    if (info.level === 2) return "#ffb7b7"; // 優勢
+    return "#e85b5b";                      // 大優勢（濃い赤）
   }
+  return "#dddddd";
+}
 
-  return "#888888";
+// 枠の色（視認性UP用）
+function labelBorderColor(key) {
+  const info = getLabelInfo(key);
+  if (!info) return "#cccccc";
+
+  if (info.side === "zero") return "#999999";
+
+  if (info.side === "neg") {
+    if (info.level === 1) return "#7999ff";
+    if (info.level === 2) return "#4d6fe3";
+    return "#2c49a8";
+  }
+  if (info.side === "pos") {
+    if (info.level === 1) return "#ff7a7a";
+    if (info.level === 2) return "#e85b5b";
+    return "#b52f2f";
+  }
+  return "#cccccc";
+}
+
+// 文字色（背景が濃いときは白）
+function labelTextColor(key) {
+  const bg = labelBgColor(key);
+  // 超ざっくり判定（R成分で判定）
+  const r = parseInt(bg.slice(1, 3), 16);
+  if (r < 150) return "#ffffff";
+  return "#222222";
 }
 
 // 擬似乱数：問題シャッフル用
@@ -83,7 +108,7 @@ async function loadQuestions(seed = Date.now()) {
   return shuffled.slice(0, 8);
 }
 
-// CP値→キー（7段階）
+// CP値→ラベルキー
 function labelKeyFromCp(cp) {
   if (cp <= -1600) return "先手大劣勢";
   if (cp <= -900)  return "先手劣勢";
@@ -92,6 +117,12 @@ function labelKeyFromCp(cp) {
   if (cp < 900)    return "先手有利";
   if (cp < 1400)   return "先手優勢";
   return "先手大優勢";
+}
+
+// 評価値の表示（+をつける）
+function formatCp(cp) {
+  if (cp > 0) return `+${cp}`;
+  return `${cp}`;
 }
 
 function renderQuiz(questions) {
@@ -113,16 +144,10 @@ function renderQuiz(questions) {
       </div>
       <p style="font-size:14px;margin:8px 0 6px;">この局面の形勢は？（先手視点）</p>
       <div id="btns" style="margin-bottom:12px;"></div>
-      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:8px;">
-        <button id="prevBtn"${idx === 0 ? " disabled" : ""} style="flex:1;padding:6px 10px;">
+      <div style="display:flex;justify-content:flex-start;gap:8px;margin-top:8px;">
+        <button id="prevBtn"${idx === 0 ? " disabled" : ""} style="padding:6px 12px;">
           戻る
         </button>
-        <button id="skipBtn" style="flex:1;padding:6px 10px;">
-          スキップ
-        </button>
-      </div>
-      <div class="range-note">
-        ※ 選択すると自動で次の問題へ進みます（最後の問題は結果画面へ）。
       </div>
     `;
 
@@ -135,16 +160,18 @@ function renderQuiz(questions) {
       b.style.margin = "4px 0";
       b.style.padding = "6px 10px";
       b.style.borderRadius = "6px";
-      b.style.border = "1px solid #ccc";
+      b.style.borderWidth = "2px";
+      b.style.borderStyle = "solid";
+      b.style.borderColor = labelBorderColor(info.key);
       b.style.width = "100%";
       b.style.textAlign = "left";
       b.style.boxSizing = "border-box";
-      b.style.backgroundColor = labelColor(info.key);
-      b.style.color = "#ffffff";
+      b.style.backgroundColor = labelBgColor(info.key);
+      b.style.color = labelTextColor(info.key);
       b.style.fontSize = "13px";
 
       if (selectedKey === info.key) {
-        b.style.outline = "3px solid #333";
+        b.style.boxShadow = "0 0 0 3px rgba(0,0,0,0.25)";
       }
 
       b.onclick = () => {
@@ -165,17 +192,6 @@ function renderQuiz(questions) {
     prevBtn.onclick = () => {
       if (idx > 0) {
         idx--;
-        show();
-      }
-    };
-
-    // スキップ（未回答のままでも次に進む）
-    const skipBtn = document.getElementById("skipBtn");
-    skipBtn.onclick = () => {
-      if (idx === questions.length - 1) {
-        renderResult(questions, answers);
-      } else {
-        idx++;
         show();
       }
     };
@@ -202,17 +218,18 @@ function renderResult(questions, answers) {
     return s;
   }, 0);
 
-  // 傾向：中央値で判定（未回答は除外）
+  // 傾向（平均値で7段階評価）
   const filteredDiffs = diffs.filter(d => d !== null);
   let tendency = "判定不能";
   if (filteredDiffs.length > 0) {
-    const sorted = [...filteredDiffs].sort((a, b) => a - b);
-    const med = sorted[Math.floor(sorted.length / 2)];
-    tendency =
-      med >= 2  ? "超楽観派" :
-      med >= 1  ? "楽観派"   :
-      med > -1  ? "正確派"  :
-      med > -2  ? "悲観派"  : "超悲観派";
+    const avg = filteredDiffs.reduce((s,d)=>s+d,0) / filteredDiffs.length;
+    if (avg <= -2.0)       tendency = "超悲観派";
+    else if (avg <= -1.0)  tendency = "悲観派";
+    else if (avg <= -0.3)  tendency = "やや悲観派";
+    else if (avg < 0.3)    tendency = "正確派";
+    else if (avg < 1.0)    tendency = "やや楽観派";
+    else if (avg < 2.0)    tendency = "楽観派";
+    else                   tendency = "超楽観派";
   }
 
   let html = `
@@ -263,7 +280,10 @@ function renderResult(questions, answers) {
             <div><b>あなた：</b>
               <span style="color:${color};">${userLabelText}</span>
             </div>
-            <div><b>正解：</b>${correctLabelText}（AI評価値：${q.aiCp}）</div>
+            <div>
+              <b>正解：</b>${correctLabelText}
+              &emsp;AI評価値：${formatCp(q.aiCp)}
+            </div>
           </div>
         </div>
       </div>
