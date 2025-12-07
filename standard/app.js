@@ -7,7 +7,8 @@ const MANIFEST_URL = "../data/manifest.json";
  *  - side: "neg" | "zero" | "pos"
  *  - level: 0,1,2,3（段階）
  *
- *  ※表示順：大優勢（一番上）〜大劣勢（一番下）
+ *  表示順（上→下）:
+ *   先手大優勢 → 先手優勢 → 先手有利 → 互角 → 先手不利 → 先手劣勢 → 先手大劣勢
  */
 const LABEL_INFO = [
   { key: "先手大優勢", label: "先手大優勢（+1600以上）",    side: "pos",  level: 3 },
@@ -34,7 +35,7 @@ function getLabelInfo(key) {
   return LABEL_INFO.find(l => l.key === key);
 }
 
-// 背景色
+// 背景色（指定してくれたバージョン）
 function labelBgColor(key) {
   const info = getLabelInfo(key);
   if (!info) return "#dddddd";
@@ -78,7 +79,6 @@ function labelBorderColor(key) {
 // 文字色（背景が濃いときは白）
 function labelTextColor(key) {
   const bg = labelBgColor(key);
-  // 超ざっくり判定（R成分で判定）
   const r = parseInt(bg.slice(1, 3), 16);
   if (r < 150) return "#ffffff";
   return "#222222";
@@ -187,7 +187,7 @@ function renderQuiz(questions) {
       btns.appendChild(b);
     });
 
-    // 戻るボタン
+    // 戻るボタンのみ（スキップなし）
     const prevBtn = document.getElementById("prevBtn");
     prevBtn.onclick = () => {
       if (idx > 0) {
@@ -233,10 +233,26 @@ function renderResult(questions, answers) {
   }
 
   let html = `
-    <h2 style="font-size:18px;margin-bottom:4px;">結果</h2>
-    <p style="margin:4px 0;">精度スコア：${score.toFixed(1)} / ${questions.length} 点</p>
-    <p style="margin:4px 0 10px;">傾向：${tendency}</p>
-    <h3 style="font-size:15px;margin:14px 0 8px;">各問の結果（クリックで盤面拡大）</h3>
+    <div style="
+      margin-bottom:14px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:linear-gradient(135deg,#ffe08a,#ffb3b3);
+      color:#333;
+    ">
+      <div style="font-size:18px;font-weight:bold;margin-bottom:4px;">結果</div>
+      <div style="font-size:13px;margin-bottom:2px;">
+        <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:#ffffffaa;font-weight:bold;">
+          精度スコア：${score.toFixed(1)} / ${questions.length} 点
+        </span>
+      </div>
+      <div style="font-size:13px;">
+        <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:#ffffffaa;font-weight:bold;">
+          傾向：${tendency}
+        </span>
+      </div>
+    </div>
+    <h3 style="font-size:15px;margin:0 0 8px;">各問の結果（クリックで盤面拡大）</h3>
   `;
 
   questions.forEach((q, i) => {
@@ -245,6 +261,7 @@ function renderResult(questions, answers) {
     const userInfo = getLabelInfo(userKey);
     const correctInfo = getLabelInfo(correctKey);
 
+    // ◯×色
     let mark = "×";
     let color = "#cc0000";
     if (userKey === "未回答") {
@@ -259,7 +276,8 @@ function renderResult(questions, answers) {
     }
 
     const userLabelText = userInfo ? userInfo.label : "未回答";
-    const correctLabelText = correctInfo ? correctInfo.label : correctKey;
+    // 正解表示は「互角」「先手有利」などレンジなし
+    const correctBaseLabel = correctInfo ? correctInfo.key : correctKey;
 
     html += `
       <div style="margin-bottom:8px;border:1px solid #eee;padding:8px 8px 8px 10px;
@@ -281,7 +299,7 @@ function renderResult(questions, answers) {
               <span style="color:${color};">${userLabelText}</span>
             </div>
             <div>
-              <b>正解：</b>${correctLabelText}
+              <b>正解：</b>${correctBaseLabel}
               &emsp;AI評価値：${formatCp(q.aiCp)}
             </div>
           </div>
@@ -293,6 +311,13 @@ function renderResult(questions, answers) {
   html += `
     <div style="margin-top:12px;font-size:12px;color:#777;">
       ※ 画像をクリックすると、その場で拡大・縮小できます。
+    </div>
+    <div style="margin-top:16px;text-align:center;">
+      <button id="retryBtn"
+        style="padding:8px 16px;border-radius:999px;border:none;
+               background:#4b8fff;color:#fff;font-size:13px;cursor:pointer;">
+        もう一度挑戦する
+      </button>
     </div>
   `;
 
@@ -314,12 +339,24 @@ function renderResult(questions, answers) {
       }
     });
   });
+
+  // もう一度挑戦する
+  const retryBtn = document.getElementById("retryBtn");
+  retryBtn.addEventListener("click", () => {
+    start();
+  });
+}
+
+// 起動用ラッパー
+function start() {
+  document.getElementById("app").textContent = "読み込み中…";
+  loadQuestions()
+    .then(renderQuiz)
+    .catch(err => {
+      document.getElementById("app").textContent = "読み込みエラー：" + err;
+      console.error(err);
+    });
 }
 
 // 起動
-loadQuestions()
-  .then(renderQuiz)
-  .catch(err => {
-    document.getElementById("app").textContent = "読み込みエラー：" + err;
-    console.error(err);
-  });
+start();
