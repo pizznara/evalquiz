@@ -238,23 +238,79 @@ function renderResult(questions, answers) {
 
   let html = `
     <div style="
-      margin-bottom:16px;
-      padding:14px 14px;
-      border-radius:14px;
+      margin-bottom:18px;
+      padding:14px 16px;
+      border-radius:16px;
       background:linear-gradient(135deg,#ffe08a,#ffb3b3);
       color:#333;
     ">
-      <div style="font-size:20px;font-weight:bold;margin-bottom:6px;">結果</div>
-      <div style="font-size:16px;margin-bottom:4px;">
-        精度スコア：
-        <span style="font-weight:bold;">${score.toFixed(1)} / ${questions.length} 点</span>
-      </div>
-      <div style="font-size:16px;">
-        傾向：
-        <span style="font-weight:bold;">${tendency}</span>
-        <span style="font-size:14px;margin-left:6px;">
-          （平均ずれ：${avgAbsDiffText} 段階）
+      <div style="margin-bottom:8px;">
+        <span style="
+          display:inline-block;
+          padding:4px 12px;
+          border-radius:999px;
+          background:#ffffffcc;
+          border:1px solid #ffb36b;
+          font-size:16px;
+          font-weight:bold;
+        ">
+          結果
         </span>
+      </div>
+      <div style="font-size:15px;margin-bottom:6px;">
+        <span style="
+          display:inline-block;
+          padding:4px 10px;
+          border-radius:999px;
+          background:#fff3c4;
+          font-weight:bold;
+          margin-right:4px;
+        ">
+          精度スコア
+        </span>
+        <span style="
+          display:inline-block;
+          padding:4px 10px;
+          border-radius:999px;
+          background:#ffffffcc;
+          font-weight:bold;
+        ">
+          ${score.toFixed(1)} / ${questions.length} 点
+        </span>
+      </div>
+      <div style="font-size:15px;">
+        <span style="
+          display:inline-block;
+          padding:4px 10px;
+          border-radius:999px;
+          background:#ffd6ea;
+          font-weight:bold;
+          margin-right:4px;
+        ">
+          傾向
+        </span>
+        <span style="
+          display:inline-block;
+          padding:4px 10px;
+          border-radius:999px;
+          background:#ffffffcc;
+          font-weight:bold;
+        ">
+          ${tendency}
+        </span>
+        <span style="
+          display:inline-block;
+          padding:3px 8px;
+          border-radius:999px;
+          background:#ffffff99;
+          font-size:13px;
+          margin-left:4px;
+        ">
+          平均ずれ：${avgAbsDiffText} 段階
+        </span>
+      </div>
+      <div style="font-size:12px;color:#555;margin-top:8px;line-height:1.5;">
+        精度スコアは「正解＝1点」「1段階ずれ＝0.5点」「2段階以上ずれ＝0点」として、全 8 問の合計点を出しています。
       </div>
     </div>
     <h3 style="font-size:15px;margin:0 0 8px;">各問の結果（クリックで盤面拡大）</h3>
@@ -293,9 +349,9 @@ function renderResult(questions, answers) {
             data-large="${q.large}"
             data-expanded="false"
             class="result-img"
-            style="width:80px;cursor:pointer;border:1px solid #ccc;border-radius:4px;flex-shrink:0;"
+            style="width:88px;cursor:pointer;border:1px solid #ccc;border-radius:4px;flex-shrink:0;"
           >
-          <div style="font-size:13px;">
+          <div style="font-size:14px;">
             <div><b>第${i + 1}問：</b>
               <span style="color:${color};font-weight:bold;">${mark}</span>
             </div>
@@ -312,7 +368,6 @@ function renderResult(questions, answers) {
     `;
   });
 
-  // ※注意書きは削除、その代わり再挑戦ボタンだけ
   html += `
     <div style="margin-top:16px;text-align:center;">
       <button id="retryBtn"
@@ -325,7 +380,7 @@ function renderResult(questions, answers) {
 
   app.innerHTML = html;
 
-  // クリックでサムネ ↔ 大画像 切り替え（機能はそのまま）
+  // クリックでサムネ ↔ 大画像 切り替え
   document.querySelectorAll(".result-img").forEach(img => {
     img.addEventListener("click", () => {
       const expanded = img.dataset.expanded === "true";
@@ -336,7 +391,7 @@ function renderResult(questions, answers) {
         img.dataset.expanded = "true";
       } else {
         img.src = img.dataset.thumb;
-        img.style.width = "80px";
+        img.style.width = "88px";
         img.dataset.expanded = "false";
       }
     });
