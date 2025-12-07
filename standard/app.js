@@ -256,9 +256,6 @@ function renderResult(questions, answers) {
           （平均ずれ：${avgAbsDiffText} 段階）
         </span>
       </div>
-      <div style="font-size:12px;color:#555;margin-top:8px;line-height:1.5;">
-        精度スコアは「正解＝1点」「1段階ずれ＝0.5点」「2段階以上ずれ＝0点」として、全 8 問の合計点を出しています。
-      </div>
     </div>
     <h3 style="font-size:15px;margin:0 0 8px;">各問の結果（クリックで盤面拡大）</h3>
   `;
