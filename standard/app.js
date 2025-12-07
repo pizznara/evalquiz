@@ -15,7 +15,6 @@ const LABEL_INFO = [
   { key: "先手優勢",   label: "先手優勢（+900〜+1399）",    side: "pos",  level: 2 },
   { key: "先手有利",   label: "先手有利（+400〜+799）",     side: "pos",  level: 1 },
   { key: "互角",       label: "互角（±299以内）",            side: "zero", level: 0 },
-  // ★ 帯の数字を逆転させたバージョン
   { key: "先手不利",   label: "先手不利（-400〜-799）",     side: "neg",  level: 1 },
   { key: "先手劣勢",   label: "先手劣勢（-900〜-1399）",    side: "neg",  level: 2 },
   { key: "先手大劣勢", label: "先手大劣勢（-1600以下）",   side: "neg",  level: 3 },
@@ -237,7 +236,7 @@ function renderResult(questions, answers) {
     else                   tendency = "超楽観派";
   }
 
-  // ★ 結果ヘッダーをさらに派手＆ラベルっぽく
+  // ★ 結果ヘッダー（形勢判断診断バッジ削除＆絵文字＋少し大きめ）
   let html = `
     <div style="
       margin-bottom:20px;
@@ -254,46 +253,36 @@ function renderResult(questions, answers) {
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
         <span style="
           display:inline-block;
-          padding:4px 10px;
+          padding:5px 14px;
           border-radius:999px;
           background:#ffffffdd;
           border:1px solid #ffb36b;
-          font-size:16px;
+          font-size:18px;
           font-weight:bold;
         ">
           📊 結果
         </span>
-        <span style="
-          display:inline-block;
-          padding:3px 8px;
-          border-radius:999px;
-          background:#ffffff80;
-          font-size:12px;
-          letter-spacing:0.5px;
-        ">
-          形勢判断診断
-        </span>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:4px;">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;">
         <div>
           <span style="
             display:inline-block;
-            padding:4px 10px;
+            padding:5px 11px;
             border-radius:999px;
             background:#fff3c4;
             font-weight:bold;
-            font-size:13px;
+            font-size:14px;
             margin-right:4px;
           ">
-            精度スコア
+            🎯 精度スコア
           </span>
           <span style="
             display:inline-block;
-            padding:4px 12px;
+            padding:5px 13px;
             border-radius:999px;
             background:#ffffffdd;
             font-weight:bold;
-            font-size:16px;
+            font-size:18px;
           ">
             ${score.toFixed(1)} / ${questions.length} 点
           </span>
@@ -303,22 +292,22 @@ function renderResult(questions, answers) {
         <div>
           <span style="
             display:inline-block;
-            padding:4px 10px;
+            padding:5px 11px;
             border-radius:999px;
             background:#ffd6ea;
             font-weight:bold;
-            font-size:13px;
+            font-size:14px;
             margin-right:4px;
           ">
-            傾向
+            🧭 傾向
           </span>
           <span style="
             display:inline-block;
-            padding:4px 12px;
+            padding:5px 13px;
             border-radius:999px;
             background:#ffffffdd;
             font-weight:bold;
-            font-size:15px;
+            font-size:17px;
           ">
             ${tendency}
           </span>
@@ -326,7 +315,7 @@ function renderResult(questions, answers) {
         <div>
           <span style="
             display:inline-block;
-            padding:3px 9px;
+            padding:4px 9px;
             border-radius:999px;
             background:#ffffffaa;
             font-size:12px;
