@@ -35,7 +35,7 @@ function getLabelInfo(key) {
   return LABEL_INFO.find(l => l.key === key);
 }
 
-// 背景色（指定してくれたバージョン）
+// 背景色
 function labelBgColor(key) {
   const info = getLabelInfo(key);
   if (!info) return "#dddddd";
@@ -218,11 +218,15 @@ function renderResult(questions, answers) {
     return s;
   }, 0);
 
-  // 傾向（平均値で7段階評価）
-  const filteredDiffs = diffs.filter(d => d !== null);
+  // 傾向（平均値で7段階評価）＆平均ずれ段階
+  const answeredDiffs = diffs.filter(d => d !== null);
   let tendency = "判定不能";
-  if (filteredDiffs.length > 0) {
-    const avg = filteredDiffs.reduce((s,d)=>s+d,0) / filteredDiffs.length;
+  let avgAbsDiffText = "—";
+  if (answeredDiffs.length > 0) {
+    const avg = answeredDiffs.reduce((s,d)=>s+d,0) / answeredDiffs.length;
+    const avgAbs = answeredDiffs.reduce((s,d)=>s+Math.abs(d),0) / answeredDiffs.length;
+    avgAbsDiffText = avgAbs.toFixed(1);
+
     if (avg <= -2.0)       tendency = "超悲観派";
     else if (avg <= -1.0)  tendency = "悲観派";
     else if (avg <= -0.3)  tendency = "やや悲観派";
@@ -234,22 +238,26 @@ function renderResult(questions, answers) {
 
   let html = `
     <div style="
-      margin-bottom:14px;
-      padding:10px 12px;
-      border-radius:12px;
+      margin-bottom:16px;
+      padding:14px 14px;
+      border-radius:14px;
       background:linear-gradient(135deg,#ffe08a,#ffb3b3);
       color:#333;
     ">
-      <div style="font-size:18px;font-weight:bold;margin-bottom:4px;">結果</div>
-      <div style="font-size:13px;margin-bottom:2px;">
-        <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:#ffffffaa;font-weight:bold;">
-          精度スコア：${score.toFixed(1)} / ${questions.length} 点
+      <div style="font-size:20px;font-weight:bold;margin-bottom:6px;">結果</div>
+      <div style="font-size:16px;margin-bottom:4px;">
+        精度スコア：
+        <span style="font-weight:bold;">${score.toFixed(1)} / ${questions.length} 点</span>
+      </div>
+      <div style="font-size:16px;">
+        傾向：
+        <span style="font-weight:bold;">${tendency}</span>
+        <span style="font-size:14px;margin-left:6px;">
+          （平均ずれ：${avgAbsDiffText} 段階）
         </span>
       </div>
-      <div style="font-size:13px;">
-        <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:#ffffffaa;font-weight:bold;">
-          傾向：${tendency}
-        </span>
+      <div style="font-size:12px;color:#555;margin-top:8px;line-height:1.5;">
+        精度スコアは「正解＝1点」「1段階ずれ＝0.5点」「2段階以上ずれ＝0点」として、全 8 問の合計点を出しています。
       </div>
     </div>
     <h3 style="font-size:15px;margin:0 0 8px;">各問の結果（クリックで盤面拡大）</h3>
@@ -276,7 +284,6 @@ function renderResult(questions, answers) {
     }
 
     const userLabelText = userInfo ? userInfo.label : "未回答";
-    // 正解表示は「互角」「先手有利」などレンジなし
     const correctBaseLabel = correctInfo ? correctInfo.key : correctKey;
 
     html += `
@@ -308,10 +315,8 @@ function renderResult(questions, answers) {
     `;
   });
 
+  // ※注意書きは削除、その代わり再挑戦ボタンだけ
   html += `
-    <div style="margin-top:12px;font-size:12px;color:#777;">
-      ※ 画像をクリックすると、その場で拡大・縮小できます。
-    </div>
     <div style="margin-top:16px;text-align:center;">
       <button id="retryBtn"
         style="padding:8px 16px;border-radius:999px;border:none;
@@ -323,7 +328,7 @@ function renderResult(questions, answers) {
 
   app.innerHTML = html;
 
-  // クリックでサムネ ↔ 大画像 切り替え
+  // クリックでサムネ ↔ 大画像 切り替え（機能はそのまま）
   document.querySelectorAll(".result-img").forEach(img => {
     img.addEventListener("click", () => {
       const expanded = img.dataset.expanded === "true";
