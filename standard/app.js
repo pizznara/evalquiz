@@ -173,7 +173,7 @@ function renderQuiz(questions) {
       b.style.backgroundColor = labelBgColor(info.key);
       b.style.color = labelTextColor(info.key);
       b.style.fontSize = "13px";
-      b.style.fontWeight = "700";
+      b.style.fontWeight = "400";
       b.style.cursor = "pointer";
       b.style.transition = "transform .06s ease";
 
