@@ -115,11 +115,11 @@ function formatCp(cp) {
 function scoreComment(score, total){
   // totalは8想定だけど将来拡張に備えて比率でもOK
   const s = Number(score.toFixed(1));
-  if (s >= total) return "素晴らしい！形勢判断完璧！";
-  if (s >= total - 2) return "強い！正確に形勢判断できてるね。";
-  if (s >= total - 3.5) return "いい感じ！たまにズレるけど全体は安定。";
-  if (s >= total - 5) return "伸びしろあり！まずは“互角付近”を丁寧に。";
-  return "挑戦心ナイス！感想戦で精度が一気に上がるタイプ。";
+  if (s >= total) return "素晴らしい！形勢判断名人クラス！";
+  if (s >= total - 2) return "強い！正確に形勢判断できてるね！";
+  if (s >= total - 3.5) return "いい感じ！";
+  if (s >= total - 5) return "がんばろう！";
+  return "挑戦ありがとう！";
 }
 
 /* ====== UI（スタイリッシュ寄せ） ====== */
