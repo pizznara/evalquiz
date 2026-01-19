@@ -347,7 +347,6 @@ function renderResult(questions, answers) {
            <div style="margin-top:4px;">
  <span style="color:#5b6572;">あなた：</span>
 <span style="color:${userTextColor};">${userLabelText}</span>
-
 </div>
 
             <div style="margin-top:2px;color:#2b3137;">
