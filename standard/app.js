@@ -68,11 +68,9 @@ function labelBorderColor(key) {
 }
 
 function labelTextColor(key) {
-  const bg = labelBgColor(key);
-  const r = parseInt(bg.slice(1, 3), 16);
-  if (r < 150) return "#ffffff";
   return "#222222";
 }
+
 
 /* ====== util ====== */
 function mulberry32(a){
