@@ -183,7 +183,7 @@ function renderQuiz(questions) {
       const b = document.createElement("button");
       b.textContent = info.label;
       b.style.display = "block";
-      b.style.margin = "6px 0";
+      b.style.margin = "4px 0";
       b.style.padding = "8px 10px";
       b.style.borderRadius = "10px";
       b.style.borderWidth = "2px";
