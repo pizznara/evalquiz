@@ -345,19 +345,9 @@ function renderResult(questions, answers) {
               第${i + 1}問 <span style="color:${color};margin-left:6px;">${mark}</span>
             </div>
            <div style="margin-top:4px;">
-  <span style="color:#5b6572;font-weight:800;">あなた：</span>
-  <span style="
-    display:inline-block;
-    margin-left:6px;
-    padding:3px 10px;
-    border-radius:999px;
-    background:${chip.bg};
-    color:${chip.text};
-    font-size:12.5px;
-    font-weight:900;
-  ">
-    ${userLabelText}
-  </span>
+ <span style="color:#5b6572;">あなた：</span>
+<span style="color:${userTextColor};">${userLabelText}</span>
+
 </div>
 
             <div style="margin-top:2px;color:#2b3137;">
