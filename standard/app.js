@@ -347,6 +347,16 @@ if (diff === null) {
   ">${dir} ${Math.abs(diff)}</span>`;
 }
 
+    // 有利以上＝赤、不利以下＝青、互角＝黒
+function sideTextColor(key){
+  const info = getLabelInfo(key);
+  if (!info) return "#222";
+
+  if (info.side === "pos") return "#b52f2f"; // 赤
+  if (info.side === "neg") return "#2c49a8"; // 青
+  return "#222"; // 互角
+}
+
     html += `
       <div style="
         margin-bottom:10px;border:1px solid #eef0f5;padding:10px;border-radius:16px;background:#ffffff;
