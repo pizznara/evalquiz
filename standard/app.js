@@ -4,13 +4,13 @@ const MANIFEST_URL = "../data/manifest.json";
  * 7段階ラベル情報（表示順：大優勢→大劣勢）
  */
 const LABEL_INFO = [
-  { key: "先手大優勢", label: "先手大優勢（+1600以上）",     side: "pos",  level: 3 },
-  { key: "先手優勢",   label: "先手優勢（+900〜+1399）",    side: "pos",  level: 2 },
-  { key: "先手有利",   label: "先手有利（+400〜+799）",     side: "pos",  level: 1 },
-  { key: "互角",       label: "互角（±299以内）",            side: "zero", level: 0 },
-  { key: "先手不利",   label: "先手不利（-400〜-799）",     side: "neg",  level: 1 },
-  { key: "先手劣勢",   label: "先手劣勢（-900〜-1399）",    side: "neg",  level: 2 },
-  { key: "先手大劣勢", label: "先手大劣勢（-1600以下）",   side: "neg",  level: 3 },
+  { key: "先手大優勢", label: "先手大優勢（+1600以上）",    side: "pos",  level: 3 },
+  { key: "先手優勢",   label: "先手優勢（+900〜+1399）",   side: "pos",  level: 2 },
+  { key: "先手有利",   label: "先手有利（+400〜+799）",    side: "pos",  level: 1 },
+  { key: "互角",       label: "互角（±299以内）",           side: "zero", level: 0 },
+  { key: "先手不利",   label: "先手不利（-400〜-799）",    side: "neg",  level: 1 },
+  { key: "先手劣勢",   label: "先手劣勢（-900〜-1399）",   side: "neg",  level: 2 },
+  { key: "先手大劣勢", label: "先手大劣勢（-1600以下）",  side: "neg",  level: 3 },
 ];
 
 // 段階スコア（採点用）
@@ -28,7 +28,7 @@ function getLabelInfo(key) {
   return LABEL_INFO.find(l => l.key === key);
 }
 
-/* ===== ボタン色（あなたが指定した“前の色味”） ===== */
+/* ===== ボタン色（あなたの“前の色味”） ===== */
 function labelBgColor(key) {
   const info = getLabelInfo(key);
   if (!info) return "#dddddd";
@@ -113,7 +113,6 @@ function formatCp(cp) {
 }
 
 function scoreComment(score, total){
-  // totalは8想定だけど将来拡張に備えて比率でもOK
   const s = Number(score.toFixed(1));
   if (s >= total) return "素晴らしい！形勢判断名人クラス！";
   if (s >= total - 2) return "強い！正確に形勢判断できてるね！";
@@ -122,7 +121,29 @@ function scoreComment(score, total){
   return "挑戦ありがとう！";
 }
 
-/* ====== UI（スタイリッシュ寄せ） ====== */
+/* ====== tiny UI helpers ====== */
+function pill(label, value){
+  return `
+    <div style="
+      padding:10px 12px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;
+    ">
+      <div style="font-size:12px;color:#5b6572;font-weight:700;">${label}</div>
+      <div style="font-size:18px;font-weight:700;margin-top:4px;color:#1f2328;">${value}</div>
+    </div>
+  `;
+}
+function softCard(html){
+  return `
+    <div style="
+      padding:14px 14px 12px;border-radius:18px;background:#ffffff;border:1px solid #e7e9ee;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.08); margin-bottom: 12px;
+    ">
+      ${html}
+    </div>
+  `;
+}
+
+/* ====== Quiz ====== */
 function renderQuiz(questions) {
   const app = document.getElementById("app");
   let idx = 0;
@@ -138,10 +159,13 @@ function renderQuiz(questions) {
       </div>
 
       <div style="text-align:center;margin-bottom:10px;">
-        <img src="${q.large}" style="max-width:min(430px,92%);height:auto;border:1px solid #e7e9ee;border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,0.06);">
+        <img src="${q.large}" style="
+          max-width:min(430px,92%);height:auto;border:1px solid #e7e9ee;border-radius:16px;
+          box-shadow:0 10px 24px rgba(0,0,0,0.06);
+        ">
       </div>
 
-      <div style="font-size:14px;margin:8px 2px 10px;font-weight:700;">
+      <div style="font-size:14px;margin:8px 2px 10px;font-weight:600;color:#1f2328;">
         この局面の形勢は？（先手番）
       </div>
 
@@ -150,7 +174,7 @@ function renderQuiz(questions) {
       <div style="display:flex;justify-content:flex-start;gap:8px;margin-top:10px;">
         <button id="prevBtn"${idx === 0 ? " disabled" : ""} style="
           padding:8px 12px;border-radius:999px;border:1px solid #d9dde6;background:#fff;cursor:pointer;
-          font-size:13px; color:#222;
+          font-size:13px; color:#222; font-weight:500;
         ">戻る</button>
       </div>
     `;
@@ -169,13 +193,14 @@ function renderQuiz(questions) {
       b.style.borderColor = labelBorderColor(info.key);
       b.style.width = "100%";
       b.style.textAlign = "left";
-      b.style.boxSizing = "border-box";
       b.style.backgroundColor = labelBgColor(info.key);
       b.style.color = labelTextColor(info.key);
       b.style.fontSize = "13px";
-      b.style.fontWeight = "400";
+      b.style.fontWeight = "400";         // ←細くして読みやすく
+      b.style.letterSpacing = "0.1px";
+      b.style.lineHeight = "1.3";
       b.style.cursor = "pointer";
-      b.style.transition = "transform .06s ease";
+      b.style.transition = "transform .06s ease, box-shadow .12s ease";
 
       b.onmousedown = () => { b.style.transform = "scale(0.99)"; };
       b.onmouseup = () => { b.style.transform = "scale(1)"; };
@@ -190,7 +215,7 @@ function renderQuiz(questions) {
           renderResult(questions, answers);
         } else {
           idx++;
-          show();
+          show(); // 次へボタンなしで自動進行
         }
       };
 
@@ -204,6 +229,7 @@ function renderQuiz(questions) {
   show();
 }
 
+/* ====== Result ====== */
 function renderResult(questions, answers) {
   const app = document.getElementById("app");
 
@@ -224,10 +250,12 @@ function renderResult(questions, answers) {
   const answeredDiffs = diffs.filter(d => d !== null);
   let tendency = "判定不能";
   let avgAbsDiffText = "—";
+  let avgSignedText = "—";
   if (answeredDiffs.length > 0) {
     const avg = answeredDiffs.reduce((s,d)=>s+d,0) / answeredDiffs.length;
     const avgAbs = answeredDiffs.reduce((s,d)=>s+Math.abs(d),0) / answeredDiffs.length;
     avgAbsDiffText = avgAbs.toFixed(1);
+    avgSignedText = avg.toFixed(2);
 
     if (avg <= -2.0)       tendency = "超悲観派";
     else if (avg <= -1.0)  tendency = "悲観派";
@@ -240,43 +268,31 @@ function renderResult(questions, answers) {
 
   const comment = scoreComment(score, questions.length);
 
-  // スマート＆見やすい結果ヘッダー
-  let html = `
-    <div style="
-      padding:14px 14px 12px;
-      border-radius:18px;
-      background:#ffffff;
-      border:1px solid #e7e9ee;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
-      margin-bottom: 12px;
-    ">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <div style="font-size:18px;font-weight:900;">📊 結果</div>
-        <div style="font-size:12px;color:#5b6572;">平均ずれ：<b style="color:#222;">${avgAbsDiffText}</b> 段階</div>
-      </div>
-
-      <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div style="padding:10px 12px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;">
-          <div style="font-size:12px;color:#5b6572;font-weight:800;">🎯 精度スコア</div>
-          <div style="font-size:20px;font-weight:900;margin-top:2px;">
-            ${score.toFixed(1)} <span style="font-size:13px;color:#5b6572;font-weight:800;">/ ${questions.length} 点</span>
-          </div>
-        </div>
-        <div style="padding:10px 12px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;">
-          <div style="font-size:12px;color:#5b6572;font-weight:800;">🧭 傾向</div>
-          <div style="font-size:18px;font-weight:900;margin-top:4px;">${tendency}</div>
-        </div>
-      </div>
-
-      <div style="margin-top:10px;padding:10px 12px;border-radius:16px;background:#fff7e6;border:1px solid #ffe2b4;">
-        <div style="font-weight:900;">💬 ${comment}</div>
+  const header = softCard(`
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <div style="font-size:18px;font-weight:700;color:#1f2328;">📊 結果</div>
+      <div style="font-size:12px;color:#5b6572;line-height:1.5;text-align:right;">
+        平均ずれ：<b style="color:#1f2328;font-weight:700;">${avgAbsDiffText}</b> 段階<br>
+        （平均の寄り：<span style="font-weight:600;color:#1f2328;">${avgSignedText}</span>）
       </div>
     </div>
 
-    <div style="font-size:14px;font-weight:900;margin:6px 0 8px;">各問の結果</div>
-  `;
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      ${pill("🎯 精度スコア", `${score.toFixed(1)} <span style="font-size:12px;color:#5b6572;font-weight:600;">/ ${questions.length} 点</span>`)}
+      ${pill("🧭 傾向", tendency)}
+    </div>
 
-  // 各問（少しだけ大きめ）
+    <div style="
+      margin-top:10px;padding:10px 12px;border-radius:16px;background:#fff7e6;border:1px solid #ffe2b4;
+      line-height:1.6;
+    ">
+      <div style="font-weight:700;color:#1f2328;">💬 ${comment}</div>
+    </div>
+  `);
+
+  let html = header;
+  html += `<div style="font-size:14px;font-weight:700;margin:6px 0 8px;color:#1f2328;">各問の結果</div>`;
+
   questions.forEach((q, i) => {
     const userKey = answers[q.id] || "未回答";
     const correctKey = labelKeyFromCp(q.aiCp);
@@ -298,13 +314,8 @@ function renderResult(questions, answers) {
 
     html += `
       <div style="
-        margin-bottom:10px;
-        border:1px solid #eef0f5;
-        padding:10px;
-        border-radius:16px;
-        background:#ffffff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-        border-left:5px solid ${color};
+        margin-bottom:10px;border:1px solid #eef0f5;padding:10px;border-radius:16px;background:#ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-left:5px solid ${color};
       ">
         <div style="display:flex;align-items:center;gap:12px;">
           <img
@@ -314,19 +325,20 @@ function renderResult(questions, answers) {
             data-expanded="false"
             class="result-img"
             style="width:92px;cursor:pointer;border:1px solid #dfe3ea;border-radius:10px;flex-shrink:0;"
+            alt="thumb"
           >
-          <div style="font-size:14px;line-height:1.55;">
-            <div style="font-weight:900;">
+          <div style="font-size:13.5px;line-height:1.6;color:#1f2328;">
+            <div style="font-weight:700;">
               第${i + 1}問 <span style="color:${color};margin-left:6px;">${mark}</span>
             </div>
-            <div style="margin-top:2px;">
-              <span style="color:#5b6572;font-weight:800;">あなた：</span>
-              <span style="font-weight:800;">${userLabelText}</span>
+            <div style="margin-top:2px;color:#2b3137;">
+              <span style="color:#5b6572;font-weight:600;">あなた：</span>
+              <span style="font-weight:600;">${userLabelText}</span>
             </div>
-            <div style="margin-top:2px;">
-              <span style="color:#5b6572;font-weight:800;">正解：</span>
-              <span style="font-weight:900;">${correctBaseLabel}</span>
-              <span style="margin-left:8px;color:#5b6572;">AI評価値：</span><b>${formatCp(q.aiCp)}</b>
+            <div style="margin-top:2px;color:#2b3137;">
+              <span style="color:#5b6572;font-weight:600;">正解：</span>
+              <span style="font-weight:700;">${correctBaseLabel}</span>
+              <span style="margin-left:8px;color:#5b6572;">AI評価値：</span><span style="font-weight:700;">${formatCp(q.aiCp)}</span>
             </div>
           </div>
         </div>
@@ -338,7 +350,7 @@ function renderResult(questions, answers) {
     <div style="margin-top:12px;text-align:center;">
       <button id="retryBtn" style="
         padding:10px 16px;border-radius:999px;border:none;
-        background:#4b8fff;color:#fff;font-size:14px;font-weight:900;cursor:pointer;
+        background:#4b8fff;color:#fff;font-size:14px;font-weight:700;cursor:pointer;
         box-shadow:0 10px 22px rgba(75,143,255,0.22);
       ">もう一度挑戦する</button>
     </div>
@@ -346,7 +358,7 @@ function renderResult(questions, answers) {
 
   app.innerHTML = html;
 
-  // クリックでサムネ ↔ 大画像 切り替え（その場で拡大）
+  // クリックでサムネ ↔ 大画像（その場で拡大）
   document.querySelectorAll(".result-img").forEach(img => {
     img.addEventListener("click", () => {
       const expanded = img.dataset.expanded === "true";
