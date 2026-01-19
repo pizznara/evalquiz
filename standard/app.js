@@ -118,7 +118,7 @@ function scoreComment(score, total){
   if (s >= total - 2) return "強い！正確に形勢判断できてるね！";
   if (s >= total - 3.5) return "いい感じ！";
   if (s >= total - 5) return "がんばろう！";
-  return "挑戦ありがとう！";
+  return "また挑戦してね！";
 }
 
 /* ====== tiny UI helpers ====== */
@@ -272,8 +272,7 @@ function renderResult(questions, answers) {
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
       <div style="font-size:18px;font-weight:700;color:#1f2328;">📊 結果</div>
       <div style="font-size:12px;color:#5b6572;line-height:1.5;text-align:right;">
-        平均ずれ：<b style="color:#1f2328;font-weight:700;">${avgAbsDiffText}</b> 段階<br>
-        （平均の寄り：<span style="font-weight:600;color:#1f2328;">${avgSignedText}</span>）
+        平均ずれ：<b style="color:#1f2328;font-weight:700;">${avgAbsDiffText}</b> 段階
       </div>
     </div>
 
