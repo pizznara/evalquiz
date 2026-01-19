@@ -71,6 +71,21 @@ function labelTextColor(key) {
   return "#222222";
 }
 
+function chipColor(key){
+  const info = getLabelInfo(key);
+  if (!info) return { bg:"#eee", text:"#222" };
+
+  if (info.side === "zero") {
+    return { bg:"#eeeeee", text:"#444" }; // 互角：灰
+  }
+  if (info.side === "pos") {
+    return { bg:"#ffe1e1", text:"#a40000" }; // 楽観：赤
+  }
+  if (info.side === "neg") {
+    return { bg:"#e6edff", text:"#1f3fbf" }; // 悲観：青
+  }
+}
+
 
 /* ====== util ====== */
 function mulberry32(a){
@@ -308,6 +323,7 @@ function renderResult(questions, answers) {
 
     const userLabelText = userInfo ? userInfo.label : "未回答";
     const correctBaseLabel = correctInfo ? correctInfo.key : correctKey;
+    const chip = chipColor(userKey);
 
     html += `
       <div style="
@@ -328,10 +344,22 @@ function renderResult(questions, answers) {
             <div style="font-weight:700;">
               第${i + 1}問 <span style="color:${color};margin-left:6px;">${mark}</span>
             </div>
-            <div style="margin-top:2px;color:#2b3137;">
-              <span style="color:#5b6572;font-weight:600;">あなた：</span>
-              <span style="font-weight:600;">${userLabelText}</span>
-            </div>
+           <div style="margin-top:4px;">
+  <span style="color:#5b6572;font-weight:800;">あなた：</span>
+  <span style="
+    display:inline-block;
+    margin-left:6px;
+    padding:3px 10px;
+    border-radius:999px;
+    background:${chip.bg};
+    color:${chip.text};
+    font-size:12.5px;
+    font-weight:900;
+  ">
+    ${userLabelText}
+  </span>
+</div>
+
             <div style="margin-top:2px;color:#2b3137;">
               <span style="color:#5b6572;font-weight:600;">正解：</span>
               <span style="font-weight:700;">${correctBaseLabel}</span>
