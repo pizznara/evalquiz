@@ -186,8 +186,8 @@ function renderQuiz(questions) {
       b.textContent = info.label;
       b.style.display = "block";
       b.style.margin = "6px 0";
-      b.style.padding = "10px 12px";
-      b.style.borderRadius = "14px";
+      b.style.padding = "8px 10px";
+      b.style.borderRadius = "10px";
       b.style.borderWidth = "2px";
       b.style.borderStyle = "solid";
       b.style.borderColor = labelBorderColor(info.key);
