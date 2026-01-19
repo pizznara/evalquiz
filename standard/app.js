@@ -245,7 +245,6 @@ function renderQuiz(questions) {
 /* ====== Result ====== */
 function renderResult(questions, answers) {
   const app = document.getElementById("app");
-
   const diffs = questions.map(q => {
     const userKey = answers[q.id] || "未回答";
     const correctKey = labelKeyFromCp(q.aiCp);
@@ -323,7 +322,30 @@ function renderResult(questions, answers) {
 
     const userLabelText = userInfo ? userInfo.label : "未回答";
     const correctBaseLabel = correctInfo ? correctInfo.key : correctKey;
-    const chip = chipColor(userKey);
+const userTextColor =
+  userKey === "未回答" ? "#8b93a1" : sideTextColor(userKey);
+
+const correctTextColor = sideTextColor(correctKey);
+
+// 正解との差
+let diff = null;
+if (userKey !== "未回答") diff = IDX[userKey] - IDX[correctKey];
+
+let diffBadge = "";
+if (diff === null) {
+  diffBadge = `<span style="font-size:11px;color:#8b93a1;">未回答</span>`;
+} else if (diff === 0) {
+  diffBadge = `<span style="
+    display:inline-block;padding:2px 8px;border-radius:999px;
+    font-size:11px;background:#e8f7ee;color:#1a8f3a;
+  ">±0</span>`;
+} else {
+  const dir = diff > 0 ? "楽観寄り" : "悲観寄り";
+  diffBadge = `<span style="
+    display:inline-block;padding:2px 8px;border-radius:999px;
+    font-size:11px;background:#eef0f5;color:#1f2328;
+  ">${dir} ${Math.abs(diff)}</span>`;
+}
 
     html += `
       <div style="
@@ -360,15 +382,47 @@ function renderResult(questions, answers) {
     `;
   });
 
-  html += `
-    <div style="margin-top:12px;text-align:center;">
-      <button id="retryBtn" style="
-        padding:10px 16px;border-radius:999px;border:none;
-        background:#4b8fff;color:#fff;font-size:14px;font-weight:700;cursor:pointer;
-        box-shadow:0 10px 22px rgba(75,143,255,0.22);
-      ">もう一度挑戦する</button>
+html += `
+  <div style="
+    margin-bottom:10px;
+    border:1px solid #eef0f5;
+    padding:10px;
+    border-radius:16px;
+    background:#ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    border-left:5px solid ${color};
+  ">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img
+        src="${q.thumb}"
+        data-thumb="${q.thumb}"
+        data-large="${q.large}"
+        data-expanded="false"
+        class="result-img"
+        style="width:92px;cursor:pointer;border:1px solid #dfe3ea;border-radius:10px;flex-shrink:0;"
+      >
+      <div style="font-size:14px;line-height:1.55;">
+        <div style="font-weight:700;display:flex;align-items:center;gap:8px;">
+          <span>第${i + 1}問 <span style="color:${color};margin-left:6px;">${mark}</span></span>
+          ${diffBadge}
+        </div>
+
+        <div style="margin-top:4px;">
+          <span style="color:#5b6572;">あなた：</span>
+          <span style="color:${userTextColor};">${userLabelText}</span>
+        </div>
+
+        <div style="margin-top:2px;">
+          <span style="color:#5b6572;">正解：</span>
+          <span style="color:${correctTextColor};">${correctBaseLabel}</span>
+          <span style="margin-left:8px;color:#5b6572;">AI評価値：</span>
+          <b>${formatCp(q.aiCp)}</b>
+        </div>
+      </div>
     </div>
-  `;
+  </div>
+`;
+
 
   app.innerHTML = html;
 
