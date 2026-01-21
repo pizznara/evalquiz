@@ -53,14 +53,8 @@ function mulberry32(a){
 
 async function loadQuestions(seed = Date.now()) {
   try {
-    const manifest = await fetch(MANIFEST_URL).then(r => {
-      if (!r.ok) throw new Error("manifest.jsonが見つかりません");
-      return r.json();
-    });
-    const all = await fetch(DATA_DIR + manifest.shards[0]).then(r => {
-      if (!r.ok) throw new Error("問題データが見つかりません");
-      return r.json();
-    });
+    const manifest = await fetch(MANIFEST_URL).then(r => r.json());
+    const all = await fetch(DATA_DIR + manifest.shards[0]).then(r => r.json());
     const rnd = mulberry32(seed);
     const shuffled = [...all];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -112,7 +106,7 @@ function renderQuiz(questions) {
     LABEL_INFO.forEach(info => {
       const b = document.createElement("button");
       b.textContent = info.label;
-      b.style.cssText = `display:block;width:100%;margin:8px 0;padding:12px;border-radius:12px;border:2px solid ${labelBorderColor(info.key)};background:${labelBgColor(info.key)};font-family:inherit;font-weight:700;cursor:pointer;text-align:left;transition:0.1s;`;
+      b.style.cssText = `display:block;width:100%;margin:8px 0;padding:12px;border-radius:12px;border:2px solid ${labelBorderColor(info.key)};background:${labelBgColor(info.key)};font-family:inherit;font-weight:700;text-align:left;transition:0.1s;`;
       b.onclick = () => { 
         answers[q.id] = info.key; 
         if(++idx < questions.length) show(); else renderResult(questions, answers); 
@@ -132,14 +126,18 @@ function renderResult(questions, answers) {
   const diffDisplay = avgDiff > 0 ? `+${avgDiff.toFixed(1)}` : avgDiff.toFixed(1);
 
   let tendency = "正確派";
-  if (avgDiff <= -1.0) tendency = "悲観派"; else if (avgDiff <= -0.3) tendency = "やや悲観派";
-  else if (avgDiff >= 1.0) tendency = "楽観派"; else if (avgDiff >= 0.3) tendency = "やや楽観派";
+  if (avgDiff <= -1.5) tendency = "超悲観派"; 
+  else if (avgDiff <= -1.0) tendency = "悲観派"; 
+  else if (avgDiff <= -0.3) tendency = "やや悲観派";
+  else if (avgDiff >= 1.5) tendency = "超楽観派"; 
+  else if (avgDiff >= 1.0) tendency = "楽観派"; 
+  else if (avgDiff >= 0.3) tendency = "やや楽観派";
 
   let barHtml = diffs.map((d, i) => {
-    // 勢いのあるグラフ：1段階20pxではみ出しやすく設定
+    // 勢い重視：1段階20px（最大±60px）
     const h = Math.abs(d) * 20, isR = d > 0;
     const color = d === 0 ? "#ffd700" : (isR ? "#e85b5b" : "#2c49a8");
-    // 正解時は中心に★
+    // 正解時に★を表示
     const content = d === 0 ? '<span style="position:absolute; bottom:calc(50% - 11px); font-size:16px; z-index:2;">★</span>' : '';
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100px;position:relative;">
       <div style="position:absolute;${isR?'bottom:50%':'top:50%'};width:60%;height:${h}px;background:${color};border-radius:2px;z-index:1;"></div>
