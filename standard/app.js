@@ -100,11 +100,20 @@ function formatCp(cp) {
   return cp > 0 ? `+${cp}` : `${cp}`;
 }
 
+function scoreComment(score, total){
+  const s = Number(score.toFixed(1));
+  if (s >= total) return "素晴らしい！形勢判断名人クラス！";
+  if (s >= total - 2) return "強い！正確に形勢判断できてるね！";
+  if (s >= total - 3.5) return "いい感じ！";
+  if (s >= total - 5) return "がんばろう！";
+  return "また挑戦してね！";
+}
+
 function pill(label, value){
   return `
-    <div style="padding:10px 12px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;">
-      <div style="font-size:11px;color:#5b6572;font-weight:700;">${label}</div>
-      <div style="font-size:16px;font-weight:700;margin-top:4px;color:#1f2328;">${value}</div>
+    <div style="padding:10px 12px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5; text-align:center;">
+      <div style="font-size:12px;color:#5b6572;font-weight:700;">${label}</div>
+      <div style="font-size:18px;font-weight:700;margin-top:4px;color:#1f2328;">${value}</div>
     </div>
   `;
 }
@@ -174,10 +183,10 @@ function renderResult(questions, answers) {
   else if (avg < 2.0) tendency = "楽観派";
   else tendency = "超楽観派";
 
-  // --- グラフHTML生成 ---
+  // --- グラフHTML生成（枠内に収まるよう1段階14pxに調整） ---
   let barHtml = "";
   diffs.forEach((d, i) => {
-    const height = Math.abs(d) * 20;
+    const height = Math.abs(d) * 14; 
     const isRakkan = d > 0;
     const color = d === 0 ? "#ffd700" : (isRakkan ? "#e85b5b" : "#2c49a8");
     barHtml += `
@@ -195,12 +204,14 @@ function renderResult(questions, answers) {
     <div style="padding:14px; border-radius:18px; background:#ffffff; border:1px solid #e7e9ee; box-shadow: 0 10px 28px rgba(0,0,0,0.08); margin-bottom: 20px; text-align:left;">
       <div style="font-size:18px; font-weight:800; color:#1f2328; margin-bottom:15px; border-bottom:2px solid #f4f6f8; padding-bottom:10px;">📊 診断結果</div>
       
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
         ${pill("🎯 精度スコア", `${score.toFixed(1)} / 8.0`)}
         ${pill("🧭 判定", `${tendency} (${diffDisplay})`)}
       </div>
 
-      <div style="margin:25px 0 30px; padding:15px 5px; background:#f8f9fa; border:3px solid #e9ecef; border-radius:12px;">
+      <div style="margin-bottom:20px; padding:10px; border-radius:12px; background:#fff7e6; border:1px solid #ffe2b4; font-weight:700; text-align:center;">💬 ${scoreComment(score, questions.length)}</div>
+
+      <div style="margin:10px 0 30px; padding:15px 5px; background:#f8f9fa; border:3px solid #e9ecef; border-radius:12px;">
         <div style="display:flex; align-items:flex-end; height:100px; background:linear-gradient(to bottom, transparent 49.5%, #dee2e6 49.5%, #dee2e6 50.5%, transparent 50.5%);">
           ${barHtml}
         </div>
@@ -212,7 +223,10 @@ function renderResult(questions, answers) {
       </a>
     </div>
 
-    <div style="font-size:14px; font-weight:700; margin:0 0 10px; text-align:left;">各問の詳細</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div style="font-size:14px; font-weight:700;">各問の詳細</div>
+      <div style="font-size:11px; color:#8b93a1;">📸 画像クリックで拡大</div>
+    </div>
     <div id="details"></div>
     <button id="retryBtn" style="width:100%; padding:14px; border-radius:12px; border:none; background:#f4f6f8; color:#1f2328; font-weight:700; cursor:pointer; margin-top:15px; border:1px solid #d9dde6;">もう一度挑戦する</button>
   `;
@@ -230,8 +244,8 @@ function renderResult(questions, answers) {
       <img src="${q.thumb}" data-thumb="${q.thumb}" data-large="${q.large}" data-expanded="false" class="result-img" style="width:80px; border-radius:8px; cursor:pointer; flex-shrink:0;">
       <div style="font-size:13px; flex:1;">
         <div style="font-weight:700; margin-bottom:4px;">第${i+1}問 ${getDiffBadge(diff)}</div>
-        <div style="color:${sideTextColor(userKey)}">あなた: <b>${userKey}</b></div>
-        <div style="color:${sideTextColor(correctKey)}">正解: ${correctKey} (${formatCp(q.aiCp)})</div>
+        <div style="color:${sideTextColor(userKey)}">あなた: ${userKey}</div>
+        <div style="color:${sideTextColor(correctKey)}">正解: <b>${correctKey}</b> (${formatCp(q.aiCp)})</div>
       </div>
     `;
     details.appendChild(detailBox);
