@@ -35,11 +35,13 @@ function sideTextColor(key) {
   return info.side === "pos" ? "#b52f2f" : "#2c49a8";
 }
 
+// 詳細部分の「！」を削除し、文言を調整
 function getDiffBadge(diff) {
   if (diff === null) return "";
-  if (diff === 0) return `<div style="background:#fff200; border:1px solid #e6b800; padding:2px 8px; border-radius:6px; font-weight:bold; color:#5c4d00; font-size:11px; display:inline-block;">✨ ピタリ！</div>`;
+  if (diff === 0) return `<div style="background:#fff200; border:1px solid #e6b800; padding:2px 8px; border-radius:6px; font-weight:bold; color:#5c4d00; font-size:11px; display:inline-block;">✨ ピタリ</div>`;
   const abs = Math.abs(diff), isRakkan = diff > 0;
-  return `<div style="background:${isRakkan?'#ffecec':'#e6edff'}; border:1px solid ${isRakkan?'#ffb7b7':'#c3d4ff'}; padding:2px 8px; border-radius:6px; font-weight:bold; color:${isRakkan?'#e85b5b':'#2c49a8'}; font-size:11px; display:inline-block;">${isRakkan?'↑':'↓'} ${isRakkan ? (abs>=2?'超楽観的！':'楽観的') : (abs>=2?'超悲観的！':'悲観的')} (${isRakkan?'+':''}${diff})</div>`;
+  let text = isRakkan ? (abs>=2?'超楽観的':'楽観的') : (abs>=2?'超悲観的':'悲観的');
+  return `<div style="background:${isRakkan?'#ffecec':'#e6edff'}; border:1px solid ${isRakkan?'#ffb7b7':'#c3d4ff'}; padding:2px 8px; border-radius:6px; font-weight:bold; color:${isRakkan?'#e85b5b':'#2c49a8'}; font-size:11px; display:inline-block;">${isRakkan?'↑':'↓'} ${text} (${isRakkan?'+':''}${diff})</div>`;
 }
 
 function mulberry32(a){
@@ -86,9 +88,9 @@ function scoreComment(score, total){
   return "また挑戦してね！";
 }
 
-// 精度スコアと判定の大きさを揃え、少し大きく調整
+// 精度スコアと判定を大きくし、高さを揃える
 function pill(label, value){
-  return `<div style="padding:10px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;"><div style="font-size:13px;color:#5b6572;font-weight:700;">${label}</div><div style="font-size:20px;font-weight:900;margin-top:4px;color:#1f2328;line-height:1.2;">${value}</div></div>`;
+  return `<div style="padding:12px 10px;border-radius:18px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;"><div style="font-size:14px;color:#5b6572;font-weight:700;">${label}</div><div style="font-size:22px;font-weight:900;margin-top:6px;color:#1f2328;line-height:1.2;">${value}</div></div>`;
 }
 
 function renderQuiz(questions) {
@@ -135,7 +137,6 @@ function renderResult(questions, answers) {
   else if (avgDiff >= 0.3) tendency = "やや楽観派";
 
   let barHtml = diffs.map((d, i) => {
-    // 突き抜け幅を少し抑制（1段階15px、最大±45px）
     const h = Math.abs(d) * 15, isR = d > 0;
     const color = d === 0 ? "#ffd700" : (isR ? "#e85b5b" : "#2c49a8");
     const content = d === 0 ? '<span style="position:absolute; bottom:calc(50% - 11px); font-size:16px; z-index:2;">★</span>' : '';
@@ -150,9 +151,10 @@ function renderResult(questions, answers) {
   
   app.innerHTML = `
     <div style="text-align:left;">
-      <div style="display:grid;grid-template-columns:1.1fr 1.3fr;gap:10px;margin-bottom:15px;">
-        ${pill("🎯 精度スコア", `${score.toFixed(1)} / 8.0`)}
-        ${pill("🧭 判定", `${tendency} (${diffDisplay})`)}
+      <div style="font-size:20px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
+      <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:12px;margin-bottom:15px;">
+        ${pill("🎯 精度スコア", `${score.toFixed(1)} <span style="font-size:14px; font-weight:700;">/ 8.0</span>`)}
+        ${pill("🧭 判定", `${tendency} <span style="font-size:14px; font-weight:700;">(平均${diffDisplay})</span>`)}
       </div>
       <div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;">💬 ${scoreComment(score, 8)}</div>
       <div style="margin:10px 0 35px;padding:15px 5px;background:#f8f9fa;border:3px solid #e9ecef;border-radius:12px;">
