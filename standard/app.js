@@ -28,32 +28,16 @@ function labelBgColor(key) {
   const info = getLabelInfo(key);
   if (!info) return "#dddddd";
   if (info.side === "zero") return "#eeeeee";
-  if (info.side === "neg") {
-    if (info.level === 1) return "#e8f0ff";
-    if (info.level === 2) return "#c3d4ff";
-    return "#7999ff";
-  }
-  if (info.side === "pos") {
-    if (info.level === 1) return "#ffecec";
-    if (info.level === 2) return "#ffb7b7";
-    return "#e85b5b";
-  }
+  if (info.side === "neg") return ["#e8f0ff", "#c3d4ff", "#7999ff"][info.level - 1];
+  if (info.side === "pos") return ["#ffecec", "#ffb7b7", "#e85b5b"][info.level - 1];
 }
 
 function labelBorderColor(key) {
   const info = getLabelInfo(key);
   if (!info) return "#cccccc";
   if (info.side === "zero") return "#999999";
-  if (info.side === "neg") {
-    if (info.level === 1) return "#7999ff";
-    if (info.level === 2) return "#4d6fe3";
-    return "#2c49a8";
-  }
-  if (info.side === "pos") {
-    if (info.level === 1) return "#ff7a7a";
-    if (info.level === 2) return "#e85b5b";
-    return "#b52f2f";
-  }
+  if (info.side === "neg") return ["#7999ff", "#4d6fe3", "#2c49a8"][info.level - 1];
+  if (info.side === "pos") return ["#ff7a7a", "#e85b5b", "#b52f2f"][info.level - 1];
 }
 
 function sideTextColor(key) {
@@ -62,6 +46,23 @@ function sideTextColor(key) {
   if (info.side === "pos") return "#b52f2f"; 
   if (info.side === "neg") return "#2c49a8";
   return "#5b6572";
+}
+
+/* ===== 1. バッジ生成関数 ===== */
+function getDiffBadge(diff) {
+  if (diff === null) return "";
+  if (diff === 0) {
+    return `<div style="background:#fff200; border:1px solid #e6b800; padding:2px 8px; border-radius:6px; font-weight:bold; color:#5c4d00; font-size:11px; display:inline-block;">✨ ピタリ！</div>`;
+  }
+  const abs = Math.abs(diff);
+  const isRakkan = diff > 0;
+  const bg = isRakkan ? "#ffecec" : "#e6edff";
+  const border = isRakkan ? "#ffb7b7" : "#c3d4ff";
+  const color = isRakkan ? "#e85b5b" : "#2c49a8";
+  const icon = isRakkan ? "↑" : "↓";
+  const text = isRakkan ? (abs >= 2 ? "超楽観的！" : "楽観的") : (abs >= 2 ? "超悲観的！" : "悲観的");
+  
+  return `<div style="background:${bg}; border:1px solid ${border}; padding:2px 8px; border-radius:6px; font-weight:bold; color:${color}; font-size:11px; display:inline-block;">${icon} ${text} (${isRakkan?'+':''}${diff})</div>`;
 }
 
 /* ====== util ====== */
@@ -118,6 +119,7 @@ function pill(label, value){
     </div>
   `;
 }
+
 function softCard(html){
   return `
     <div style="padding:14px;border-radius:18px;background:#ffffff;border:1px solid #e7e9ee;box-shadow: 0 10px 28px rgba(0,0,0,0.08); margin-bottom: 12px;">
@@ -168,7 +170,7 @@ function renderQuiz(questions) {
   show();
 }
 
-/* ====== Result Screen ====== */
+/* ====== 2. グラフ・シェア付き結果表示 ====== */
 function renderResult(questions, answers) {
   const app = document.getElementById("app");
   const diffs = questions.map(q => {
@@ -179,7 +181,7 @@ function renderResult(questions, answers) {
 
   const score = diffs.reduce((s, d) => (d === 0 ? s + 1 : (Math.abs(d) === 1 ? s + 0.5 : s)), 0);
   const answeredDiffs = diffs.filter(d => d !== null);
-  let tendency = "判定不能", avgAbsDiffText = "—", avgSignedText = "—";
+  let tendency = "判定不能", avgAbsDiffText = "—";
 
   if (answeredDiffs.length > 0) {
     const avg = answeredDiffs.reduce((s,d)=>s+d,0) / answeredDiffs.length;
@@ -193,43 +195,74 @@ function renderResult(questions, answers) {
     else tendency = "超楽観派";
   }
 
+  // --- グラフHTML生成 ---
+  let barHtml = "";
+  diffs.forEach((d, i) => {
+    const height = Math.abs(d) * 20; // 1段階20px
+    const isRakkan = d > 0;
+    const color = d === 0 ? "#ffd700" : (isRakkan ? "#e85b5b" : "#2c49a8");
+    barHtml += `
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100px; position:relative;">
+        <div style="position:absolute; ${isRakkan?'bottom:50%':'top:50%'}; width:70%; height:${height}px; background:${color}; border-radius:2px;"></div>
+        <div style="position:absolute; bottom:-18px; font-size:10px; color:#8b93a1;">Q${i+1}</div>
+      </div>
+    `;
+  });
+
+  // --- シェアURL生成 ---
+  const shareText = encodeURIComponent(`【将棋・形勢判断診断】\n精度スコア: ${score.toFixed(1)} / 8.0\n判定: ${tendency}\n#将棋 #評価値クイズ`);
+  const shareUrl = `https://twitter.com/intent/tweet?text=${shareText}`;
+
   let html = softCard(`
     <div style="display:flex;justify-content:space-between;">
-      <div style="font-size:18px;font-weight:700;">📊 結果</div>
+      <div style="font-size:18px;font-weight:700;">📊 診断結果</div>
       <div style="font-size:12px;color:#5b6572;">平均ずれ: <b>${avgAbsDiffText}</b> 段階</div>
     </div>
     <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       ${pill("🎯 精度スコア", `${score.toFixed(1)} / ${questions.length}`)}
       ${pill("🧭 傾向", tendency)}
     </div>
+
+    <div style="margin-top:30px; margin-bottom:20px; border-top:1px dashed #eee; padding-top:15px;">
+      <div style="font-size:11px; color:#8b93a1; text-align:center; margin-bottom:10px;">判断の偏り（中心がAIとの一致）</div>
+      <div style="display:flex; align-items:flex-end; height:100px; border-left:1px solid #eee; border-right:1px solid #eee; background:linear-gradient(to bottom, transparent 49.5%, #eee 49.5%, #eee 50.5%, transparent 50.5%);">
+        ${barHtml}
+      </div>
+    </div>
+
     <div style="margin-top:10px;padding:10px;border-radius:12px;background:#fff7e6;border:1px solid #ffe2b4;font-weight:700;">💬 ${scoreComment(score, questions.length)}</div>
+    
+    <a href="${shareUrl}" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:8px; background:#000; color:#fff; text-decoration:none; padding:12px; border-radius:12px; font-weight:bold; margin-top:15px; font-size:14px;">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
+      結果をXでポストする
+    </a>
   `);
 
-  html += `<div style="font-size:14px;font-weight:700;margin:15px 0 10px;text-align:left;">各問の結果</div>`;
+  html += `<div style="font-size:14px;font-weight:700;margin:20px 0 10px;text-align:left;">各問の詳細</div>`;
 
   questions.forEach((q, i) => {
     const userKey = answers[q.id] || "未回答";
     const correctKey = labelKeyFromCp(q.aiCp);
     const diff = userKey !== "未回答" ? IDX[userKey] - IDX[correctKey] : null;
     const color = diff === 0 ? "#1a8f3a" : (userKey === "未回答" ? "#8b93a1" : "#d11f1f");
-    const mark = diff === 0 ? "〇" : (userKey === "未回答" ? "－" : "×");
 
     html += `
-      <div style="margin-bottom:10px; border:1px solid #eef0f5; padding:10px; border-radius:16px; background:#fff; border-left:5px solid ${color}; display:flex; gap:12px; align-items:center; text-align:left;">
-        <img src="${q.thumb}" data-thumb="${q.thumb}" data-large="${q.large}" data-expanded="false" class="result-img" style="width:80px; border-radius:8px; cursor:pointer;">
+      <div style="margin-bottom:12px; border:1px solid #eef0f5; padding:10px; border-radius:16px; background:#fff; border-left:5px solid ${color}; display:flex; gap:12px; align-items:center; text-align:left;">
+        <img src="${q.thumb}" data-thumb="${q.thumb}" data-large="${q.large}" data-expanded="false" class="result-img" style="width:80px; border-radius:8px; cursor:pointer; flex-shrink:0;">
         <div style="font-size:13px; flex:1;">
-          <div style="font-weight:700;">第${i+1}問 <span style="color:${color}">${mark}</span></div>
-          <div style="color:${sideTextColor(userKey)}">あなた: ${userKey}</div>
+          <div style="font-weight:700; margin-bottom:4px;">第${i+1}問 ${getDiffBadge(diff)}</div>
+          <div style="color:${sideTextColor(userKey)}">あなた: <b>${userKey}</b></div>
           <div style="color:${sideTextColor(correctKey)}">正解: ${correctKey} (${formatCp(q.aiCp)})</div>
         </div>
       </div>
     `;
   });
 
-  html += `<button id="retryBtn" style="width:100%; padding:14px; border-radius:12px; border:none; background:#1f2328; color:#fff; font-weight:700; cursor:pointer; margin-top:10px;">もう一度挑戦する</button>`;
+  html += `<button id="retryBtn" style="width:100%; padding:14px; border-radius:12px; border:none; background:#f4f6f8; color:#1f2328; font-weight:700; cursor:pointer; margin-top:10px; border:1px solid #d9dde6;">もう一度挑戦する</button>`;
   
   app.innerHTML = html;
 
+  // 画像拡大ロジック
   document.querySelectorAll(".result-img").forEach(img => {
     img.onclick = () => {
       const isExpanded = img.dataset.expanded === "true";
