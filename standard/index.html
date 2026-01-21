@@ -17,7 +17,17 @@
         }
         #container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
         
-        .quiz-header { text-align: center; margin-bottom: 25px; }
+        /* ポップなタイトルデザインの復元 */
+        .quiz-header { text-align: center; margin-bottom: 20px; }
+        .quiz-title { font-size: 32px; font-weight: 900; display: inline-flex; align-items: center; gap: 8px; margin: 10px 0; }
+        .highlight {
+            background: linear-gradient(135deg, #ffcc00, #ffaa00);
+            color: #fff;
+            padding: 4px 16px; border-radius: 16px;
+            box-shadow: 0 4px 0 #d48a00; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            transform: rotate(-2deg);
+        }
+
         .badge {
             display: inline-block;
             background: #eef0f5;
@@ -26,25 +36,24 @@
             font-size: 12px;
             font-weight: 900;
             color: #5b6572;
-            margin-bottom: 10px;
         }
-        h1 { font-size: 24px; font-weight: 900; margin: 10px 0; color: #1f2328; }
-        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.4; margin-bottom: 15px; }
 
-        /* 遊び方セクション */
+        /* 遊び方セクション（行間を詰め、太字を強調） */
         .rule {
             background: #ffffff;
             border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 25px;
+            padding: 18px;
+            margin-bottom: 20px;
             text-align: left;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             border: 1px solid #eef0f5;
         }
-        .rule .title { font-weight: 900; color: #1f2328; margin-bottom: 12px; font-size: 16px; display: flex; align-items: center; gap: 6px; }
-        .rule ul { margin: 0; padding: 0; list-style: none; font-size: 13px; color: #5b6572; line-height: 1.7; }
-        .rule li { position: relative; padding-left: 18px; margin-bottom: 8px; }
+        .rule .title { font-weight: 900; color: #1f2328; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+        .rule ul { margin: 0; padding: 0; list-style: none; font-size: 13px; color: #5b6572; line-height: 1.5; }
+        .rule li { position: relative; padding-left: 18px; margin-bottom: 6px; }
         .rule li::before { content: "•"; position: absolute; left: 0; color: #ffaa00; font-weight: bold; }
+        .rule b { color: #1f2328; font-weight: 900; }
 
         #app {
             background: #ffffff; border-radius: 24px; padding: 20px;
@@ -59,7 +68,9 @@
 <div id="container">
     <header class="quiz-header">
         <div class="badge">🧮 標準モード</div>
-        <h1>評価値クイズ（形勢判断診断）</h1>
+        <h1 class="quiz-title">
+            <span class="highlight">評価値</span><span class="main-text">クイズ</span>
+        </h1>
         <p class="intro-text">
             将棋AIの評価値にもとづいて、あなたの <b>形勢判断の精度</b>と、<br>
             <b>楽観／悲観の傾向</b>を診断します。
@@ -69,11 +80,11 @@
     <section class="rule">
         <div class="title">📘 遊び方</div>
         <ul>
-            <li>問題は全部で <b>8問</b>（ランダムに出題されます）。先手視点の形勢を <b>7段階（大優勢／優勢／有利／互角／不利／劣勢／大劣勢）</b>から1つ選んでください。</li>
+            <li>問題は全部で <b>8問</b>（ランダムに出題されます）。先手視点の形勢を <b>7つの選択肢</b>から1つ選んでください。</li>
             <li>精度スコアは <b>「正解＝1点」「1段階ずれ＝0.5点」「2段階以上ずれ＝0点」</b>として、全8問の合計点を出します。</li>
             <li>解答の楽観寄り／悲観寄りを平均して、<b>超悲観派〜超楽観派</b>の7段階で傾向を判定します。</li>
-            <li>評価値の算出には「水匠5」を使用し、約5億ノード読ませた時点での評価値を採用しています。</li>
-            <li>それぞれの選択肢のあいだは、100点〜200点ほど間隔をあけています。境目で迷いやすい局面を避けるためです。</li>
+            <li>評価値の算出には<b>「水匠5」</b>を使用し、約<b>5億ノード</b>読ませた時点での評価値を採用しています。</li>
+            <li>それぞれの選択肢のあいだは、<b>100点〜200点ほど間隔</b>をあけています。これは、<b>境目で迷いやすい局面を避けるため</b>です。</li>
         </ul>
     </section>
 
