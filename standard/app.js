@@ -1,4 +1,5 @@
-const MANIFEST_URL = "../data/manifest.json";
+// パスが間違っていると動かないので、ここを確認してください
+const MANIFEST_URL = "data/manifest.json"; 
 
 const LABEL_INFO = [
   { key: "先手大優勢", label: "先手大優勢（+1600以上）",    side: "pos",  level: 3 },
@@ -51,15 +52,26 @@ function mulberry32(a){
 }
 
 async function loadQuestions(seed = Date.now()) {
-  const manifest = await fetch(MANIFEST_URL).then(r => r.json());
-  const all = await fetch("../data/" + manifest.shards[0]).then(r => r.json());
-  const rnd = mulberry32(seed);
-  const shuffled = [...all];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(rnd() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  try {
+    const manifest = await fetch(MANIFEST_URL).then(r => {
+        if (!r.ok) throw new Error("manifest.jsonが見つかりません");
+        return r.json();
+    });
+    // シャードのパスも修正（data/フォルダ内にあることを想定）
+    const all = await fetch("data/" + manifest.shards[0]).then(r => {
+        if (!r.ok) throw new Error("問題データ(json)が見つかりません");
+        return r.json();
+    });
+    const rnd = mulberry32(seed);
+    const shuffled = [...all];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, 8);
+  } catch (e) {
+    throw e;
   }
-  return shuffled.slice(0, 8);
 }
 
 function labelKeyFromCp(cp) {
@@ -103,7 +115,11 @@ function renderQuiz(questions) {
       const b = document.createElement("button");
       b.textContent = info.label;
       b.style.cssText = `display:block;width:100%;margin:8px 0;padding:12px;border-radius:12px;border:2px solid ${labelBorderColor(info.key)};background:${labelBgColor(info.key)};font-family:inherit;font-weight:700;cursor:pointer;text-align:left;transition:0.1s;`;
-      b.onclick = () => { answers[q.id] = info.key; if(++idx < questions.length) show(); else renderResult(questions, answers); };
+      b.onclick = () => { 
+          answers[q.id] = info.key; 
+          if(++idx < questions.length) show(); 
+          else renderResult(questions, answers); 
+      };
       document.getElementById("btns").appendChild(b);
     });
     document.getElementById("prevBtn").onclick = () => { idx--; show(); };
@@ -164,4 +180,11 @@ function renderResult(questions, answers) {
   });
 }
 
-loadQuestions().then(renderQuiz);
+// 画面の準備ができてから実行する
+window.addEventListener('DOMContentLoaded', () => {
+    loadQuestions()
+      .then(renderQuiz)
+      .catch(err => {
+          document.getElementById("app").innerHTML = `<div style="color:red;padding:20px;">エラーが発生しました:<br>${err.message}</div>`;
+      });
+});
