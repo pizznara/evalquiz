@@ -8,7 +8,12 @@
     <style>
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
+            /* 将棋盤をイメージしたさりげない格子模様 */
             background-color: #f0f2f5;
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px),
+                linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px);
+            background-size: 40px 40px; /* 格子のサイズ */
             color: #1f2328;
             margin: 0;
             display: flex;
@@ -19,7 +24,6 @@
         
         .quiz-header { text-align: center; margin-bottom: 20px; }
 
-        /* タイトルから導入文までを包むメインカード */
         .header-card {
             background: #ffffff;
             border-radius: 24px;
@@ -38,7 +42,6 @@
             transform: rotate(-2deg);
         }
 
-        /* 標準モードバッジを少し大きく調整 */
         .badge {
             display: inline-block;
             background: #f0f2f5;
