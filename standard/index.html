@@ -15,63 +15,22 @@
             justify-content: center;
             min-height: 100vh;
         }
-
-        #container {
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* ポップなタイトルデザイン */
-        .quiz-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .quiz-title {
-            font-size: 32px;
-            font-weight: 900;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin: 0;
-        }
-
+        #container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
+        .quiz-header { text-align: center; margin-bottom: 30px; }
+        .quiz-title { font-size: 32px; font-weight: 900; display: inline-flex; align-items: center; gap: 8px; margin: 0; }
         .highlight {
             background: linear-gradient(135deg, #ffcc00, #ffaa00);
             color: #fff;
-            padding: 4px 16px;
-            border-radius: 16px;
-            box-shadow: 0 4px 0 #d48a00;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            padding: 4px 16px; border-radius: 16px;
+            box-shadow: 0 4px 0 #d48a00; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
             transform: rotate(-2deg);
         }
-
-        .main-text {
-            color: #1f2328;
-            letter-spacing: 1px;
-        }
-
-        /* クイズコンテンツが入るエリア */
         #app {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            text-align: center;
+            background: #ffffff; border-radius: 24px; padding: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center; min-height: 200px;
         }
-
-        /* 読み込み中アニメーション */
-        .loading {
-            padding: 50px 0;
-            color: #8b93a1;
-            font-size: 14px;
-        }
-        
-        button:active {
-            transform: scale(0.96);
-        }
+        .loading { padding: 50px 0; color: #8b93a1; font-size: 14px; }
+        button { font-family: 'Zen Maru Gothic', sans-serif; }
     </style>
 </head>
 <body>
@@ -82,6 +41,10 @@
             <span class="highlight">評価値</span><span class="main-text">クイズ</span>
         </h1>
     </header>
+
+    <div id="app">
+        <div class="loading" id="loading-text">読み込み中...</div>
+    </div>
 </div>
 
 <script src="js/app.js"></script>
