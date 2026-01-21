@@ -191,8 +191,3 @@ window.onload = () => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
 };
-
-
-    window.addEventListener('load', draw);
-    window.addEventListener('resize', draw);
-})();
