@@ -86,8 +86,9 @@ function scoreComment(score, total){
   return "また挑戦してね！";
 }
 
+// 精度スコアと判定の大きさを揃え、少し大きく調整
 function pill(label, value){
-  return `<div style="padding:10px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;"><div style="font-size:12px;color:#5b6572;font-weight:700;">${label}</div><div style="font-size:18px;font-weight:700;margin-top:4px;color:#1f2328;">${value}</div></div>`;
+  return `<div style="padding:10px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;"><div style="font-size:13px;color:#5b6572;font-weight:700;">${label}</div><div style="font-size:20px;font-weight:900;margin-top:4px;color:#1f2328;line-height:1.2;">${value}</div></div>`;
 }
 
 function renderQuiz(questions) {
@@ -134,10 +135,9 @@ function renderResult(questions, answers) {
   else if (avgDiff >= 0.3) tendency = "やや楽観派";
 
   let barHtml = diffs.map((d, i) => {
-    // 勢い重視：1段階20px（最大±60px）
-    const h = Math.abs(d) * 20, isR = d > 0;
+    // 突き抜け幅を少し抑制（1段階15px、最大±45px）
+    const h = Math.abs(d) * 15, isR = d > 0;
     const color = d === 0 ? "#ffd700" : (isR ? "#e85b5b" : "#2c49a8");
-    // 正解時に★を表示
     const content = d === 0 ? '<span style="position:absolute; bottom:calc(50% - 11px); font-size:16px; z-index:2;">★</span>' : '';
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100px;position:relative;">
       <div style="position:absolute;${isR?'bottom:50%':'top:50%'};width:60%;height:${h}px;background:${color};border-radius:2px;z-index:1;"></div>
@@ -150,9 +150,9 @@ function renderResult(questions, answers) {
   
   app.innerHTML = `
     <div style="text-align:left;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;">
+      <div style="display:grid;grid-template-columns:1.1fr 1.3fr;gap:10px;margin-bottom:15px;">
         ${pill("🎯 精度スコア", `${score.toFixed(1)} / 8.0`)}
-        ${pill("🧭 判定", `${tendency} (平均${diffDisplay})`)}
+        ${pill("🧭 判定", `${tendency} (${diffDisplay})`)}
       </div>
       <div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;">💬 ${scoreComment(score, 8)}</div>
       <div style="margin:10px 0 35px;padding:15px 5px;background:#f8f9fa;border:3px solid #e9ecef;border-radius:12px;">
