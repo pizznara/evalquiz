@@ -4,9 +4,9 @@ const MANIFEST_URL = DATA_DIR + "manifest.json";
 const LABEL_INFO = [
   { key: "先手大優勢", label: "先手大優勢（+1600以上）",    side: "pos",  level: 3 },
   { key: "先手優勢",   label: "先手優勢（+900〜+1399）",    side: "pos",  level: 2 },
-  { key: "先手有利",   label: "先手有利（+400〜+799）",     side: "pos",  level: 1 },
-  { key: "互角",       label: "互角（±299以内）",           side: "zero", level: 0 },
-  { key: "先手不利",   label: "先手不利（-400〜-799）",     side: "neg",  level: 1 },
+  { key: "先手有利",   label: "先手有利（+400〜+799）",      side: "pos",  level: 1 },
+  { key: "互角",       label: "互角（±299以内）",            side: "zero", level: 0 },
+  { key: "先手不利",   label: "先手不利（-400〜-799）",      side: "neg",  level: 1 },
   { key: "先手劣勢",   label: "先手劣勢（-900〜-1399）",    side: "neg",  level: 2 },
   { key: "先手大劣勢", label: "先手大劣勢（-1600以下）",   side: "neg",  level: 3 },
 ];
@@ -35,7 +35,6 @@ function sideTextColor(key) {
   return info.side === "pos" ? "#b52f2f" : "#2c49a8";
 }
 
-// 詳細部分の「！」を削除し、文言を調整
 function getDiffBadge(diff) {
   if (diff === null) return "";
   if (diff === 0) return `<div style="background:#fff200; border:1px solid #e6b800; padding:2px 8px; border-radius:6px; font-weight:bold; color:#5c4d00; font-size:11px; display:inline-block;">✨ ピタリ</div>`;
@@ -88,7 +87,6 @@ function scoreComment(score, total){
   return "また挑戦してね！";
 }
 
-// 精度スコアと判定を大きくし、高さを揃える
 function pill(label, value){
   return `<div style="padding:12px 10px;border-radius:18px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;"><div style="font-size:14px;color:#5b6572;font-weight:700;">${label}</div><div style="font-size:22px;font-weight:900;margin-top:6px;color:#1f2328;line-height:1.2;">${value}</div></div>`;
 }
@@ -121,6 +119,7 @@ function renderQuiz(questions) {
   show();
 }
 
+// 判定と表示のメイン関数
 function renderResult(questions, answers) {
   const app = document.getElementById("app");
   const diffs = questions.map(q => IDX[answers[q.id]] - IDX[labelKeyFromCp(q.aiCp)]);
@@ -128,13 +127,23 @@ function renderResult(questions, answers) {
   const avgDiff = diffs.reduce((s, d) => s + d, 0) / questions.length;
   const diffDisplay = avgDiff > 0 ? `+${avgDiff.toFixed(1)}` : avgDiff.toFixed(1);
 
-  let tendency = "正確派";
-  if (avgDiff <= -1.5) tendency = "超悲観派"; 
-  else if (avgDiff <= -1.0) tendency = "悲観派"; 
-  else if (avgDiff <= -0.3) tendency = "やや悲観派";
-  else if (avgDiff >= 1.5) tendency = "超楽観派"; 
-  else if (avgDiff >= 1.0) tendency = "楽観派"; 
-  else if (avgDiff >= 0.3) tendency = "やや楽観派";
+  // --- 新ロジック：±0.3基準の判定 ---
+  let tendency = "";
+  const absAvg = Math.abs(avgDiff);
+
+  if (absAvg <= 0.3) {
+    if (score >= 6.0)      tendency = "精密機械";
+    else if (score >= 3.0) tendency = "バランス型";
+    else                   tendency = "なんだかんだバランス型";
+  } else if (avgDiff > 0.3) {
+    if (avgDiff >= 1.5)      tendency = "超楽観派";
+    else if (avgDiff >= 1.0) tendency = "楽観派";
+    else                     tendency = "やや楽観派";
+  } else {
+    if (avgDiff <= -1.5)      tendency = "超悲観派";
+    else if (avgDiff <= -1.0) tendency = "悲観派";
+    else                      tendency = "やや悲観派";
+  }
 
   let barHtml = diffs.map((d, i) => {
     const h = Math.abs(d) * 15, isR = d > 0;
@@ -186,8 +195,60 @@ function renderResult(questions, answers) {
   });
 }
 
+// --- 背景描画システム ---
+function drawHeaderBackground() {
+    const canvas = document.getElementById('quiz-bg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const parent = canvas.parentElement;
+    
+    // 親のサイズを反映
+    canvas.width = parent.clientWidth;
+    canvas.height = parent.clientHeight;
+    const w = canvas.width;
+    const h = canvas.height;
+
+    // 白背景で塗りつぶし
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+
+    // 薄いグリッド
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.03)';
+    ctx.lineWidth = 1;
+    for(let i=0; i<w; i+=30) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,h); ctx.stroke(); }
+    for(let i=0; i<h; i+=30) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(w,i); ctx.stroke(); }
+
+    // 評価値グラフ（静止）
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(0, 191, 165, 0.4)'; // 綺麗なエメラルド
+    ctx.lineWidth = 3;
+    const data = [0.5, 0.4, 0.6, 0.3, 0.5, 0.2, 0.7, 0.4];
+    const step = w / (data.length - 1);
+    data.forEach((val, i) => {
+        const x = i * step;
+        const y = val * h;
+        if(i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // グラフ下の塗り
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(0, 191, 165, 0.1)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fill();
+}
+
+// 起動時の処理
 window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
+    // 背景描画を実行
+    drawHeaderBackground();
 };
+
+window.addEventListener('resize', drawHeaderBackground);
