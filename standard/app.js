@@ -113,7 +113,10 @@ function renderQuiz(questions) {
       const b = document.createElement("button");
       b.textContent = info.label;
       b.style.cssText = `display:block;width:100%;margin:8px 0;padding:12px;border-radius:12px;border:2px solid ${labelBorderColor(info.key)};background:${labelBgColor(info.key)};font-family:inherit;font-weight:700;cursor:pointer;text-align:left;transition:0.1s;`;
-      b.onclick = () => { answers[q.id] = info.key; if(++idx < questions.length) show(); else renderResult(questions, answers); };
+      b.onclick = () => { 
+        answers[q.id] = info.key; 
+        if(++idx < questions.length) show(); else renderResult(questions, answers); 
+      };
       document.getElementById("btns").appendChild(b);
     });
     document.getElementById("prevBtn").onclick = () => { idx--; show(); };
@@ -133,11 +136,11 @@ function renderResult(questions, answers) {
   else if (avgDiff >= 1.0) tendency = "楽観派"; else if (avgDiff >= 0.3) tendency = "やや楽観派";
 
   let barHtml = diffs.map((d, i) => {
-    // 勢いのあるグラフ：大きく間違えたら少しはみ出す(1段階20px)
+    // 勢いのあるグラフ：1段階20pxではみ出しやすく設定
     const h = Math.abs(d) * 20, isR = d > 0;
     const color = d === 0 ? "#ffd700" : (isR ? "#e85b5b" : "#2c49a8");
-    // 正解時は星を表示
-    const content = d === 0 ? '<span style="position:absolute; bottom:calc(50% - 10px); font-size:14px;">★</span>' : '';
+    // 正解時は中心に★
+    const content = d === 0 ? '<span style="position:absolute; bottom:calc(50% - 11px); font-size:16px; z-index:2;">★</span>' : '';
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100px;position:relative;">
       <div style="position:absolute;${isR?'bottom:50%':'top:50%'};width:60%;height:${h}px;background:${color};border-radius:2px;z-index:1;"></div>
       ${content}
@@ -154,7 +157,7 @@ function renderResult(questions, answers) {
         ${pill("🧭 判定", `${tendency} (平均${diffDisplay})`)}
       </div>
       <div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;">💬 ${scoreComment(score, 8)}</div>
-      <div style="margin:10px 0 30px;padding:15px 5px;background:#f8f9fa;border:3px solid #e9ecef;border-radius:12px;">
+      <div style="margin:10px 0 35px;padding:15px 5px;background:#f8f9fa;border:3px solid #e9ecef;border-radius:12px;">
         <div style="display:flex;align-items:flex-end;height:100px;background:linear-gradient(to bottom, transparent 49.5%, #dee2e6 49.5%, #dee2e6 50.5%, transparent 50.5%);">${barHtml}</div>
       </div>
       <a href="https://twitter.com/intent/tweet?text=${shareText}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;">
