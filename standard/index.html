@@ -27,7 +27,6 @@
             transform: rotate(-2deg);
         }
 
-        /* バッジの位置とスタイルの調整 */
         .badge {
             display: inline-block;
             background: #eef0f5;
@@ -36,9 +35,19 @@
             font-size: 12px;
             font-weight: 900;
             color: #5b6572;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
-        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.4; margin-bottom: 15px; }
+
+        /* 導入文の背景枠（カードデザイン） */
+        .intro-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid #eef0f5;
+        }
+        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.5; margin: 0; }
 
         .rule {
             background: #ffffff;
@@ -73,10 +82,12 @@
         <br>
         <div class="badge">🧮 標準モード</div>
         
-        <p class="intro-text">
-            将棋AIの評価値にもとづいて、あなたの <b>形勢判断の精度</b>と、<br>
-            <b>楽観／悲観の傾向</b>を診断します。
-        </p>
+        <div class="intro-card">
+            <p class="intro-text">
+                将棋AIの評価値にもとづいて、あなたの <b>形勢判断の精度</b>と、<br>
+                <b>楽観／悲観の傾向</b>を診断します。
+            </p>
+        </div>
     </header>
 
     <section class="rule">
