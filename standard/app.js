@@ -301,96 +301,100 @@ function renderResult(questions, answers) {
     </div>
   `);
 
-  let html = header;
-  html += `<div style="font-size:14px;font-weight:700;margin:6px 0 8px;color:#1f2328;">各問の結果</div>`;
+// ここから：各問の結果
+let html = header;
+html += `<div style="font-size:14px;font-weight:700;margin:6px 0 8px;color:#1f2328;">各問の結果</div>`;
 
-  questions.forEach((q, i) => {
-    const userKey = answers[q.id] || "未回答";
-    const correctKey = labelKeyFromCp(q.aiCp);
-    const userInfo = getLabelInfo(userKey);
-    const correctInfo = getLabelInfo(correctKey);
+questions.forEach((q, i) => {
+  const userKey = answers[q.id] || "未回答";
+  const correctKey = labelKeyFromCp(q.aiCp);
+  const userInfo = getLabelInfo(userKey);
+  const correctInfo = getLabelInfo(correctKey);
 
-    let mark = "×";
-    let color = "#d11f1f";
-    if (userKey === "未回答") {
-      mark = "－";
-      color = "#8b93a1";
-    } else {
-      const diff = IDX[userKey] - IDX[correctKey];
-      if (diff === 0) { mark = "〇"; color = "#1a8f3a"; }
-    }
+  // 文字色（あなた/正解）
+  const userTextColor =
+    userKey === "未回答" ? "#8b93a1" : sideTextColor(userKey);
+  const correctTextColor = sideTextColor(correctKey);
 
-    const userLabelText = userInfo ? userInfo.label : "未回答";
-    const correctBaseLabel = correctInfo ? correctInfo.key : correctKey;
-const userTextColor =
-  userKey === "未回答" ? "#8b93a1" : sideTextColor(userKey);
+  // 正解との差バッジ
+  let diff = null;
+  if (userKey !== "未回答") diff = IDX[userKey] - IDX[correctKey];
 
-const correctTextColor = sideTextColor(correctKey);
+  let diffBadge = "";
+  if (diff === null) {
+    diffBadge = `<span style="font-size:11px;color:#8b93a1;">未回答</span>`;
+  } else if (diff === 0) {
+    diffBadge = `<span style="
+      display:inline-block;padding:2px 8px;border-radius:999px;
+      font-size:11px;background:#e8f7ee;color:#1a8f3a;
+    ">±0</span>`;
+  } else {
+    const dir = diff > 0 ? "楽観寄り" : "悲観寄り";
+    diffBadge = `<span style="
+      display:inline-block;padding:2px 8px;border-radius:999px;
+      font-size:11px;background:#eef0f5;color:#1f2328;
+    ">${dir} ${Math.abs(diff)}</span>`;
+  }
 
-// 正解との差
-let diff = null;
-if (userKey !== "未回答") diff = IDX[userKey] - IDX[correctKey];
+  // ◯×と左の色（ここで color を必ず定義）
+  let mark = "×";
+  let color = "#d11f1f";
+  if (userKey === "未回答") {
+    mark = "－";
+    color = "#8b93a1";
+  } else if (diff === 0) {
+    mark = "〇";
+    color = "#1a8f3a";
+  }
 
-let diffBadge = "";
-if (diff === null) {
-  diffBadge = `<span style="font-size:11px;color:#8b93a1;">未回答</span>`;
-} else if (diff === 0) {
-  diffBadge = `<span style="
-    display:inline-block;padding:2px 8px;border-radius:999px;
-    font-size:11px;background:#e8f7ee;color:#1a8f3a;
-  ">±0</span>`;
-} else {
-  const dir = diff > 0 ? "楽観寄り" : "悲観寄り";
-  diffBadge = `<span style="
-    display:inline-block;padding:2px 8px;border-radius:999px;
-    font-size:11px;background:#eef0f5;color:#1f2328;
-  ">${dir} ${Math.abs(diff)}</span>`;
-}
+  const userLabelText = userInfo ? userInfo.label : "未回答";
+  const correctBaseLabel = correctInfo ? correctInfo.key : correctKey;
 
-    // 有利以上＝赤、不利以下＝青、互角＝黒
-function sideTextColor(key){
-  const info = getLabelInfo(key);
-  if (!info) return "#222";
+  // ここで ${color} を使う（forEachの中なのでOK）
+  html += `
+    <div style="
+      margin-bottom:10px;
+      border:1px solid #eef0f5;
+      padding:10px;
+      border-radius:16px;
+      background:#ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border-left:5px solid ${color};
+    ">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img
+          src="${q.thumb}"
+          data-thumb="${q.thumb}"
+          data-large="${q.large}"
+          data-expanded="false"
+          class="result-img"
+          style="width:92px;cursor:pointer;border:1px solid #dfe3ea;border-radius:10px;flex-shrink:0;"
+        >
+        <div style="font-size:14px;line-height:1.55;">
+          <div style="font-weight:700;display:flex;align-items:center;gap:8px;">
+            <span>第${i + 1}問 <span style="color:${color};margin-left:6px;">${mark}</span></span>
+            ${diffBadge}
+          </div>
 
-  if (info.side === "pos") return "#b52f2f"; // 赤
-  if (info.side === "neg") return "#2c49a8"; // 青
-  return "#222"; // 互角
-}
+          <div style="margin-top:4px;">
+            <span style="color:#5b6572;">あなた：</span>
+            <span style="color:${userTextColor};">${userLabelText}</span>
+          </div>
 
-    html += `
-      <div style="
-        margin-bottom:10px;border:1px solid #eef0f5;padding:10px;border-radius:16px;background:#ffffff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-left:5px solid ${color};
-      ">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <img
-            src="${q.thumb}"
-            data-thumb="${q.thumb}"
-            data-large="${q.large}"
-            data-expanded="false"
-            class="result-img"
-            style="width:92px;cursor:pointer;border:1px solid #dfe3ea;border-radius:10px;flex-shrink:0;"
-            alt="thumb"
-          >
-          <div style="font-size:13.5px;line-height:1.6;color:#1f2328;">
-            <div style="font-weight:700;">
-              第${i + 1}問 <span style="color:${color};margin-left:6px;">${mark}</span>
-            </div>
-           <div style="margin-top:4px;">
- <span style="color:#5b6572;">あなた：</span>
-<span style="color:${userTextColor};">${userLabelText}</span>
-</div>
-
-            <div style="margin-top:2px;color:#2b3137;">
-              <span style="color:#5b6572;font-weight:600;">正解：</span>
-              <span style="font-weight:700;">${correctBaseLabel}</span>
-              <span style="margin-left:8px;color:#5b6572;">AI評価値：</span><span style="font-weight:700;">${formatCp(q.aiCp)}</span>
-            </div>
+          <div style="margin-top:2px;">
+            <span style="color:#5b6572;">正解：</span>
+            <span style="color:${correctTextColor};">${correctBaseLabel}</span>
+            <span style="margin-left:8px;color:#5b6572;">AI評価値：</span>
+            <b>${formatCp(q.aiCp)}</b>
           </div>
         </div>
       </div>
-    `;
-  });
+    </div>
+  `;
+});
+
+// ここまで：各問の結果
+
 
 html += `
   <div style="
