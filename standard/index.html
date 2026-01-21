@@ -18,7 +18,18 @@
         #container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
         
         .quiz-header { text-align: center; margin-bottom: 20px; }
-        .quiz-title { font-size: 32px; font-weight: 900; display: inline-flex; align-items: center; gap: 8px; margin: 10px 0 5px 0; }
+
+        /* タイトルから導入文までを包むメインカード */
+        .header-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 25px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid #eef0f5;
+        }
+
+        .quiz-title { font-size: 32px; font-weight: 900; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 15px 0; }
         .highlight {
             background: linear-gradient(135deg, #ffcc00, #ffaa00);
             color: #fff;
@@ -27,27 +38,20 @@
             transform: rotate(-2deg);
         }
 
+        /* 標準モードバッジを少し大きく調整 */
         .badge {
             display: inline-block;
-            background: #eef0f5;
-            padding: 4px 12px;
+            background: #f0f2f5;
+            padding: 6px 16px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 900;
             color: #5b6572;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e1e4e8;
         }
 
-        /* 導入文の背景枠（カードデザイン） */
-        .intro-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border: 1px solid #eef0f5;
-        }
-        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.5; margin: 0; }
+        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.6; margin: 0; }
 
         .rule {
             background: #ffffff;
@@ -76,13 +80,12 @@
 
 <div id="container">
     <header class="quiz-header">
-        <h1 class="quiz-title">
-            <span class="highlight">評価値</span><span class="main-text">クイズ</span>
-        </h1>
-        <br>
-        <div class="badge">🧮 標準モード</div>
-        
-        <div class="intro-card">
+        <div class="header-card">
+            <h1 class="quiz-title">
+                <span class="highlight">評価値</span><span class="main-text">クイズ</span>
+            </h1>
+            <br>
+            <div class="badge">🧮 標準モード</div>
             <p class="intro-text">
                 将棋AIの評価値にもとづいて、あなたの <b>形勢判断の精度</b>と、<br>
                 <b>楽観／悲観の傾向</b>を診断します。
