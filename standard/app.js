@@ -191,53 +191,7 @@ window.onload = () => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
 };
-(function() {
-    const canvas = document.getElementById('quiz-bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
 
-    function draw() {
-        // 親要素（header-card）のサイズに合わせる
-        const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-
-        const w = canvas.width;
-        const h = canvas.height;
-
-        // 背景
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, w, h);
-
-        // グリッド線
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-        for(let i=0; i<w; i+=30) {
-            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke();
-        }
-
-        // グラフ線
-        ctx.strokeStyle = '#00ffcc';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        const data = [0.6, 0.4, 0.7, 0.3, 0.5, 0.2, 0.6]; // グラフの高さデータ
-        const step = w / (data.length - 1);
-        data.forEach((val, i) => {
-            const x = i * step;
-            const y = val * h;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-
-        // グラフ下の光
-        ctx.lineTo(w, h);
-        ctx.lineTo(0, h);
-        const grad = ctx.createLinearGradient(0, 0, 0, h);
-        grad.addColorStop(0, 'rgba(0, 255, 204, 0.1)');
-        grad.addColorStop(1, 'transparent');
-        ctx.fillStyle = grad;
-        ctx.fill();
-    }
 
     window.addEventListener('load', draw);
     window.addEventListener('resize', draw);
