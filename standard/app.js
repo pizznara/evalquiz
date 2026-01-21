@@ -1,5 +1,6 @@
-// パスが間違っていると動かないので、ここを確認してください
-const MANIFEST_URL = "data/manifest.json"; 
+// 一つ外側の階層にある data フォルダを指定
+const DATA_DIR = "../data/";
+const MANIFEST_URL = DATA_DIR + "manifest.json";
 
 const LABEL_INFO = [
   { key: "先手大優勢", label: "先手大優勢（+1600以上）",    side: "pos",  level: 3 },
@@ -54,13 +55,13 @@ function mulberry32(a){
 async function loadQuestions(seed = Date.now()) {
   try {
     const manifest = await fetch(MANIFEST_URL).then(r => {
-        if (!r.ok) throw new Error("manifest.jsonが見つかりません");
-        return r.json();
+      if (!r.ok) throw new Error("manifest.jsonが見つかりません");
+      return r.json();
     });
-    // シャードのパスも修正（data/フォルダ内にあることを想定）
-    const all = await fetch("data/" + manifest.shards[0]).then(r => {
-        if (!r.ok) throw new Error("問題データ(json)が見つかりません");
-        return r.json();
+    // データの読み込み先を DATA_DIR + ファイル名 に修正
+    const all = await fetch(DATA_DIR + manifest.shards[0]).then(r => {
+      if (!r.ok) throw new Error("問題データが見つかりません");
+      return r.json();
     });
     const rnd = mulberry32(seed);
     const shuffled = [...all];
@@ -104,9 +105,11 @@ function renderQuiz(questions) {
   let idx = 0, answers = {};
   const show = () => {
     const q = questions[idx];
+    // 画像パスの修正 (data/ フォルダの下にあるため)
+    const largeImgPath = DATA_DIR + q.large;
     app.innerHTML = `
       <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">問題 ${idx + 1} / ${questions.length}</div>
-      <img src="${q.large}" style="max-width:100%;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.1);margin-bottom:15px;">
+      <img src="${largeImgPath}" style="max-width:100%;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.1);margin-bottom:15px;">
       <div style="font-size:15px;font-weight:700;margin-bottom:15px;">この局面の形勢は？（先手番）</div>
       <div id="btns"></div>
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
@@ -115,11 +118,7 @@ function renderQuiz(questions) {
       const b = document.createElement("button");
       b.textContent = info.label;
       b.style.cssText = `display:block;width:100%;margin:8px 0;padding:12px;border-radius:12px;border:2px solid ${labelBorderColor(info.key)};background:${labelBgColor(info.key)};font-family:inherit;font-weight:700;cursor:pointer;text-align:left;transition:0.1s;`;
-      b.onclick = () => { 
-          answers[q.id] = info.key; 
-          if(++idx < questions.length) show(); 
-          else renderResult(questions, answers); 
-      };
+      b.onclick = () => { answers[q.id] = info.key; if(++idx < questions.length) show(); else renderResult(questions, answers); };
       document.getElementById("btns").appendChild(b);
     });
     document.getElementById("prevBtn").onclick = () => { idx--; show(); };
@@ -167,10 +166,12 @@ function renderResult(questions, answers) {
 
   questions.forEach((q, i) => {
     const correct = labelKeyFromCp(q.aiCp), diff = IDX[answers[q.id]] - IDX[correct];
+    const thumbImgPath = DATA_DIR + q.thumb;
+    const largeImgPath = DATA_DIR + q.large;
     const item = document.createElement("div");
     item.style.cssText = `margin-bottom:10px;padding:10px;border-radius:16px;background:#fff;border:1px solid #eee;border-left:5px solid ${diff===0?'#1a8f3a':'#d11f1f'};display:flex;gap:12px;align-items:center;`;
     item.innerHTML = `
-      <img src="${q.thumb}" onclick="this.src=this.src==='${q.thumb}'?'${q.large}':'${q.thumb}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;transition:0.2s;">
+      <img src="${thumbImgPath}" onclick="this.src=this.src==='${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;transition:0.2s;">
       <div style="font-size:13px;">
         <div style="font-weight:700;margin-bottom:4px;">Q${i+1} ${getDiffBadge(diff)}</div>
         <div style="color:${sideTextColor(answers[q.id])}">あなた: ${answers[q.id]}</div>
@@ -180,11 +181,9 @@ function renderResult(questions, answers) {
   });
 }
 
-// 画面の準備ができてから実行する
-window.addEventListener('DOMContentLoaded', () => {
-    loadQuestions()
-      .then(renderQuiz)
-      .catch(err => {
-          document.getElementById("app").innerHTML = `<div style="color:red;padding:20px;">エラーが発生しました:<br>${err.message}</div>`;
-      });
-});
+// 読み込み開始
+window.onload = () => {
+    loadQuestions().then(renderQuiz).catch(err => {
+        document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}<br>フォルダ構成を確認してください。</div>`;
+    });
+};
