@@ -1,4 +1,3 @@
-// 一つ外側の階層にある data フォルダを指定
 const DATA_DIR = "../data/";
 const MANIFEST_URL = DATA_DIR + "manifest.json";
 
@@ -58,7 +57,6 @@ async function loadQuestions(seed = Date.now()) {
       if (!r.ok) throw new Error("manifest.jsonが見つかりません");
       return r.json();
     });
-    // データの読み込み先を DATA_DIR + ファイル名 に修正
     const all = await fetch(DATA_DIR + manifest.shards[0]).then(r => {
       if (!r.ok) throw new Error("問題データが見つかりません");
       return r.json();
@@ -70,9 +68,7 @@ async function loadQuestions(seed = Date.now()) {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled.slice(0, 8);
-  } catch (e) {
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 function labelKeyFromCp(cp) {
@@ -97,7 +93,7 @@ function scoreComment(score, total){
 }
 
 function pill(label, value){
-  return `<div style="padding:10px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;"><div style="font-size:12px;color:#5b6572;font-weight:700;">${label}</div><div style="font-size:18px;font-weight:700;margin-top:4px;">${value}</div></div>`;
+  return `<div style="padding:10px;border-radius:16px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;"><div style="font-size:12px;color:#5b6572;font-weight:700;">${label}</div><div style="font-size:18px;font-weight:700;margin-top:4px;color:#1f2328;">${value}</div></div>`;
 }
 
 function renderQuiz(questions) {
@@ -105,7 +101,6 @@ function renderQuiz(questions) {
   let idx = 0, answers = {};
   const show = () => {
     const q = questions[idx];
-    // 画像パスの修正 (data/ フォルダの下にあるため)
     const largeImgPath = DATA_DIR + q.large;
     app.innerHTML = `
       <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">問題 ${idx + 1} / ${questions.length}</div>
@@ -138,52 +133,58 @@ function renderResult(questions, answers) {
   else if (avgDiff >= 1.0) tendency = "楽観派"; else if (avgDiff >= 0.3) tendency = "やや楽観派";
 
   let barHtml = diffs.map((d, i) => {
-    const h = Math.min(Math.abs(d)*14, 45), isR = d > 0;
+    // 勢いのあるグラフ：大きく間違えたら少しはみ出す(1段階20px)
+    const h = Math.abs(d) * 20, isR = d > 0;
+    const color = d === 0 ? "#ffd700" : (isR ? "#e85b5b" : "#2c49a8");
+    // 正解時は星を表示
+    const content = d === 0 ? '<span style="position:absolute; bottom:calc(50% - 10px); font-size:14px;">★</span>' : '';
     return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100px;position:relative;">
-      <div style="position:absolute;${isR?'bottom:50%':'top:50%'};width:60%;height:${h}px;background:${d===0?'#ffd700':(isR?'#e85b5b':'#2c49a8')};border-radius:2px;"></div>
+      <div style="position:absolute;${isR?'bottom:50%':'top:50%'};width:60%;height:${h}px;background:${color};border-radius:2px;z-index:1;"></div>
+      ${content}
       <div style="position:absolute;bottom:-15px;font-size:9px;color:#8b93a1;">Q${i+1}</div>
     </div>`;
   }).join("");
 
-  const shareText = encodeURIComponent(`【形勢判断診断】\n精度: ${score.toFixed(1)} / 8.0点\n傾向: ${tendency} (${diffDisplay})\n#将棋 #評価値クイズ`);
+  const shareText = encodeURIComponent(`【形勢判断診断】\n精度: ${score.toFixed(1)} / 8.0点\n傾向: ${tendency} (平均${diffDisplay})\n#将棋 #評価値クイズ`);
   
   app.innerHTML = `
     <div style="text-align:left;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;">
-        ${pill("精度スコア", score.toFixed(1))}
-        ${pill("平均のズレ", `${tendency}(${diffDisplay})`)}
+        ${pill("🎯 精度スコア", `${score.toFixed(1)} / 8.0`)}
+        ${pill("🧭 判定", `${tendency} (平均${diffDisplay})`)}
       </div>
       <div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;">💬 ${scoreComment(score, 8)}</div>
-      <div style="margin-bottom:30px;padding:15px 5px;background:#f8f9fa;border:3px solid #e9ecef;border-radius:12px;">
+      <div style="margin:10px 0 30px;padding:15px 5px;background:#f8f9fa;border:3px solid #e9ecef;border-radius:12px;">
         <div style="display:flex;align-items:flex-end;height:100px;background:linear-gradient(to bottom, transparent 49.5%, #dee2e6 49.5%, #dee2e6 50.5%, transparent 50.5%);">${barHtml}</div>
       </div>
-      <a href="https://twitter.com/intent/tweet?text=${shareText}" target="_blank" style="display:block;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;">Xでポストする</a>
-      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:10px;"><span>各問の詳細</span><span style="color:#8b93a1;font-size:11px;">📸 クリックで拡大</span></div>
+      <a href="https://twitter.com/intent/tweet?text=${shareText}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;">
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
+        結果をXでポストする
+      </a>
+      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:10px;"><span>各問の詳細</span><span style="color:#8b93a1;font-size:11px;">📸 画像クリックで拡大</span></div>
       <div id="details"></div>
-      <button onclick="location.reload()" style="width:100%;padding:14px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;">もう一度挑戦</button>
+      <button onclick="location.reload()" style="width:100%;padding:14px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;">もう一度挑戦する</button>
     </div>
   `;
 
   questions.forEach((q, i) => {
     const correct = labelKeyFromCp(q.aiCp), diff = IDX[answers[q.id]] - IDX[correct];
-    const thumbImgPath = DATA_DIR + q.thumb;
-    const largeImgPath = DATA_DIR + q.large;
+    const thumbImgPath = DATA_DIR + q.thumb, largeImgPath = DATA_DIR + q.large;
     const item = document.createElement("div");
     item.style.cssText = `margin-bottom:10px;padding:10px;border-radius:16px;background:#fff;border:1px solid #eee;border-left:5px solid ${diff===0?'#1a8f3a':'#d11f1f'};display:flex;gap:12px;align-items:center;`;
     item.innerHTML = `
       <img src="${thumbImgPath}" onclick="this.src=this.src==='${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;transition:0.2s;">
       <div style="font-size:13px;">
-        <div style="font-weight:700;margin-bottom:4px;">Q${i+1} ${getDiffBadge(diff)}</div>
+        <div style="font-weight:700;margin-bottom:4px;">第${i+1}問 ${getDiffBadge(diff)}</div>
         <div style="color:${sideTextColor(answers[q.id])}">あなた: ${answers[q.id]}</div>
-        <div style="color:${sideTextColor(correct)}">正解: <b>${correct}</b></div>
+        <div style="color:${sideTextColor(correct)}">正解: <b>${correct}</b> (${formatCp(q.aiCp)})</div>
       </div>`;
     document.getElementById("details").appendChild(item);
   });
 }
 
-// 読み込み開始
 window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
-        document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}<br>フォルダ構成を確認してください。</div>`;
+        document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
 };
