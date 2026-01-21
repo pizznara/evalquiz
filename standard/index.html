@@ -17,9 +17,8 @@
         }
         #container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
         
-        /* ポップなタイトルデザインの復元 */
         .quiz-header { text-align: center; margin-bottom: 20px; }
-        .quiz-title { font-size: 32px; font-weight: 900; display: inline-flex; align-items: center; gap: 8px; margin: 10px 0; }
+        .quiz-title { font-size: 32px; font-weight: 900; display: inline-flex; align-items: center; gap: 8px; margin: 10px 0 5px 0; }
         .highlight {
             background: linear-gradient(135deg, #ffcc00, #ffaa00);
             color: #fff;
@@ -28,6 +27,7 @@
             transform: rotate(-2deg);
         }
 
+        /* バッジの位置とスタイルの調整 */
         .badge {
             display: inline-block;
             background: #eef0f5;
@@ -36,10 +36,10 @@
             font-size: 12px;
             font-weight: 900;
             color: #5b6572;
+            margin-bottom: 15px;
         }
         .intro-text { color: #5b6572; font-size: 14px; line-height: 1.4; margin-bottom: 15px; }
 
-        /* 遊び方セクション（行間を詰め、太字を強調） */
         .rule {
             background: #ffffff;
             border-radius: 20px;
@@ -67,10 +67,12 @@
 
 <div id="container">
     <header class="quiz-header">
-        <div class="badge">🧮 標準モード</div>
         <h1 class="quiz-title">
             <span class="highlight">評価値</span><span class="main-text">クイズ</span>
         </h1>
+        <br>
+        <div class="badge">🧮 標準モード</div>
+        
         <p class="intro-text">
             将棋AIの評価値にもとづいて、あなたの <b>形勢判断の精度</b>と、<br>
             <b>楽観／悲観の傾向</b>を診断します。
@@ -83,7 +85,7 @@
             <li>問題は全部で <b>8問</b>（ランダムに出題されます）。先手視点の形勢を <b>7つの選択肢</b>から1つ選んでください。</li>
             <li>精度スコアは <b>「正解＝1点」「1段階ずれ＝0.5点」「2段階以上ずれ＝0点」</b>として、全8問の合計点を出します。</li>
             <li>解答の楽観寄り／悲観寄りを平均して、<b>超悲観派〜超楽観派</b>の7段階で傾向を判定します。</li>
-            <li>評価値の算出には<b>「水匠5」</b>を使用し、<b>約5億ノード</b>読ませた時点での評価値を採用しています。</li>
+            <li>評価値の算出には<b>「水匠5」</b>を使用し、約<b>5億ノード</b>読ませた時点での評価値を採用しています。</li>
             <li>それぞれの選択肢のあいだは、<b>100点〜200点ほど間隔</b>をあけています。これは、<b>境目で迷いやすい局面を避けるため</b>です。</li>
         </ul>
     </section>
