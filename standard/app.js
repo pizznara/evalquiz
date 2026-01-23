@@ -208,3 +208,57 @@ window.onload = () => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
 };
+
+// --- 背景の赤いグラフを描画するシステム ---
+function drawHeaderBackground() {
+    const canvas = document.getElementById('quiz-bg-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const parent = canvas.parentElement;
+    
+    // サイズを親要素に合わせる
+    canvas.width = parent.clientWidth;
+    canvas.height = parent.clientHeight;
+    const w = canvas.width;
+    const h = canvas.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // 評価値グラフ（赤色の線）
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(232, 91, 91, 0.4)'; // 先手優勢の色に近い赤色
+    ctx.lineWidth = 2;
+    
+    // グラフのデータ点（ランダム風の固定値）
+    const data = [0.6, 0.55, 0.7, 0.4, 0.8, 0.3, 0.5, 0.45];
+    const step = w / (data.length - 1);
+    
+    data.forEach((val, i) => {
+        const x = i * step;
+        const y = h - (val * h); // 上下反転して評価値っぽく
+        if(i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // グラフの下側を薄く塗る（より雰囲気が出ます）
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(232, 91, 91, 0.1)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fill();
+}
+
+// 既存の window.onload を以下のように書き換え
+window.onload = () => {
+    loadQuestions().then(renderQuiz).catch(err => {
+        document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
+    });
+    // 起動時にグラフを描画
+    drawHeaderBackground();
+};
+
+// 画面サイズが変わった時も再描画
+window.addEventListener('resize', drawHeaderBackground);
