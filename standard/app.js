@@ -83,7 +83,7 @@ function scoreComment(score, total){
   // 満点（8.0）のときだけ「神」専用メッセージ
   if (s >= total) return "全知全能の神です";
   
-  if (s >= total - 2) return "強い！正確に形勢判断できてるね！";
+  if (s >= total - 2) return "強い！正確に形勢判断できてます！";
   if (s >= total - 3.5) return "いい感じ！";
   if (s >= total - 5) return "がんばろう！";
   return "また挑戦してね！";
@@ -168,7 +168,16 @@ function renderResult(questions, answers) {
     </div>`;
   }).join("");
 
-  const shareText = encodeURIComponent(`【形勢判断診断】\n精度: ${score.toFixed(1)} / 8.0点\n傾向: ${tendency} (平均${diffDisplay})\n#将棋 #評価値クイズ`);
+  // --- シェア用テキストの構築（神と精密機械のみメッセージ追加） ---
+  let specialMessage = "";
+  if (score >= 7.9) {
+    specialMessage = "\n全知全能の神";
+  } else if (tendency === "精密機械") {
+    specialMessage = "\n人間離れした正確さ"; 
+  }
+
+  const shareContent = `【形勢判断診断】\n傾向: ${tendency}\n精度: ${score.toFixed(1)} / 8.0点${specialMessage}\n#将棋 #形勢判断診断`;
+  const shareText = encodeURIComponent(shareContent);
   
   app.innerHTML = `
     <div style="text-align:left;">
@@ -206,13 +215,6 @@ function renderResult(questions, answers) {
     document.getElementById("details").appendChild(item);
   });
 }
-
-// --- 背景描画システム ---
-function drawHeaderBackground() {
-    const canvas = document.getElementById('quiz-bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const parent = canvas.parentElement;
     
     // 親のサイズを反映
     canvas.width = parent.clientWidth;
@@ -254,13 +256,9 @@ function drawHeaderBackground() {
     ctx.fill();
 }
 
-// 起動時の処理
+// 起動時の処理（背景描画を消してスッキリさせた版）
 window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
-    // 背景描画を実行
-    drawHeaderBackground();
 };
-
-window.addEventListener('resize', drawHeaderBackground);
