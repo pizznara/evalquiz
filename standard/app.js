@@ -207,6 +207,11 @@ window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
+  // --- ここを追加 ---
+    // 最初の描画
+    drawHeaderBackground();
+    // 画面サイズが変わった時も赤い線がズレないように再描画
+    window.addEventListener('resize', drawHeaderBackground);
 };
 
 // --- 背景の赤いグラフを描画するシステム（線のみ版） ---
