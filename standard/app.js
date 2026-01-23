@@ -81,7 +81,7 @@ function formatCp(cp) { return cp > 0 ? `+${cp}` : `${cp}`; }
 function scoreComment(score, total){
   const s = Number(score.toFixed(1));
   // 満点（8.0）のときだけ「神」専用メッセージ
-  if (s >= total) return "人間を辞めていますね。全知全能の判断力です。";
+  if (s >= total) return "全知全能の神です";
   
   if (s >= total - 2) return "強い！正確に形勢判断できてるね！";
   if (s >= total - 3.5) return "いい感じ！";
