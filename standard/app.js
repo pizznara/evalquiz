@@ -207,46 +207,5 @@ window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
-  // --- ここを追加 ---
-    // 最初の描画
-    drawHeaderBackground();
-    // 画面サイズが変わった時も赤い線がズレないように再描画
-    window.addEventListener('resize', drawHeaderBackground);
-};
 
-// --- 背景の赤いグラフを描画するシステム（線のみ版） ---
-function drawHeaderBackground() {
-    const canvas = document.getElementById('quiz-bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const parent = canvas.parentElement;
-    
-    // サイズを親要素に合わせる
-    canvas.width = parent.clientWidth;
-    canvas.height = parent.clientHeight;
-    const w = canvas.width;
-    const h = canvas.height;
-
-    ctx.clearRect(0, 0, w, h);
-
-    // 評価値グラフ（赤色の線）の設定
-    ctx.beginPath();
-ctx.strokeStyle = 'rgba(70, 130, 180, 0.3)'; 
-ctx.lineWidth = 2.0; // 線を少し細くするとさらにスッキリします
-    ctx.lineJoin = 'round'; // 角を丸くして滑らかに
-    ctx.lineCap = 'round';
-    
-    // データの最大値を 0.4 (下から40%の高さ) くらいに抑える
-const data = [0.3, 0.25, 0.4, 0.15, 0.35, 0.1, 0.3, 0.2];
-    const step = w / (data.length - 1);
-    
-    data.forEach((val, i) => {
-        const x = i * step;
-        const y = h - (val * h); 
-        if(i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
-    
-    // 線を描画する
-    ctx.stroke();
 }
