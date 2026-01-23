@@ -120,6 +120,8 @@ function renderQuiz(questions) {
 }
 
 function renderResult(questions, answers) {
+  const rules = document.getElementById('rules-section');
+  if (rules) rules.style.display = 'none';
   const app = document.getElementById("app");
   const diffs = questions.map(q => IDX[answers[q.id]] - IDX[labelKeyFromCp(q.aiCp)]);
   const score = diffs.reduce((s, d) => s + (d === 0 ? 1 : (Math.abs(d) === 1 ? 0.5 : 0)), 0);
