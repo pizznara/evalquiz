@@ -29,8 +29,9 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             border: 1px solid #eef0f5;
-            /* 念のため中身がはみ出さないように */
             overflow: hidden; 
+            position: relative; 
+    z-index: 1;
         }
 
         .quiz-title { 
@@ -95,6 +96,8 @@
 <div id="container">
     <header class="quiz-header">
         <div class="header-card">
+            <canvas id="quiz-bg-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:-1;"></canvas>
+            
             <h1 class="quiz-title">
                 <span class="highlight">評価値</span><span class="main-text">クイズ</span>
             </h1>
