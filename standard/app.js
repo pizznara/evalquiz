@@ -209,7 +209,7 @@ window.onload = () => {
     });
 };
 
-// --- 背景の赤いグラフを描画するシステム ---
+// --- 背景の赤いグラフを描画するシステム（線のみ版） ---
 function drawHeaderBackground() {
     const canvas = document.getElementById('quiz-bg-canvas');
     if (!canvas) return;
@@ -224,41 +224,24 @@ function drawHeaderBackground() {
 
     ctx.clearRect(0, 0, w, h);
 
-    // 評価値グラフ（赤色の線）
+    // 評価値グラフ（赤色の線）の設定
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(232, 91, 91, 0.4)'; // 先手優勢の色に近い赤色
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(232, 91, 91, 0.5)'; // 透明度50%の赤色
+    ctx.lineWidth = 2.5; // 少しだけ線を太くして存在感を出しました
+    ctx.lineJoin = 'round'; // 角を丸くして滑らかに
+    ctx.lineCap = 'round';
     
-    // グラフのデータ点（ランダム風の固定値）
-    const data = [0.6, 0.55, 0.7, 0.4, 0.8, 0.3, 0.5, 0.45];
+    // グラフのデータ点（局面の起伏をイメージ）
+    const data = [0.6, 0.55, 0.75, 0.35, 0.85, 0.2, 0.6, 0.5];
     const step = w / (data.length - 1);
     
     data.forEach((val, i) => {
         const x = i * step;
-        const y = h - (val * h); // 上下反転して評価値っぽく
+        const y = h - (val * h); 
         if(i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
     });
+    
+    // 線を描画する
     ctx.stroke();
-
-    // グラフの下側を薄く塗る（より雰囲気が出ます）
-    ctx.lineTo(w, h);
-    ctx.lineTo(0, h);
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, 'rgba(232, 91, 91, 0.1)');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.fill();
 }
-
-// 既存の window.onload を以下のように書き換え
-window.onload = () => {
-    loadQuestions().then(renderQuiz).catch(err => {
-        document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
-    });
-    // 起動時にグラフを描画
-    drawHeaderBackground();
-};
-
-// 画面サイズが変わった時も再描画
-window.addEventListener('resize', drawHeaderBackground);
