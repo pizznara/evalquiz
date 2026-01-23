@@ -231,8 +231,8 @@ function drawHeaderBackground() {
 
     // 評価値グラフ（赤色の線）の設定
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(232, 91, 91, 0.5)'; // 透明度50%の赤色
-    ctx.lineWidth = 2.5; // 少しだけ線を太くして存在感を出しました
+ctx.strokeStyle = 'rgba(70, 130, 180, 0.3)'; 
+ctx.lineWidth = 2.0; // 線を少し細くするとさらにスッキリします
     ctx.lineJoin = 'round'; // 角を丸くして滑らかに
     ctx.lineCap = 'round';
     
