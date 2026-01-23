@@ -127,19 +127,29 @@ function renderResult(questions, answers) {
   const avgDiff = diffs.reduce((s, d) => s + d, 0) / questions.length;
   const diffDisplay = avgDiff > 0 ? `+${avgDiff.toFixed(1)}` : avgDiff.toFixed(1);
 
-  // --- 新ロジック：±0.3基準の判定 ---
+ // --- 判定ロジックの書き換え（「神」を追加） ---
   let tendency = "";
   const absAvg = Math.abs(avgDiff);
 
-  if (absAvg <= 0.3) {
-    if (score >= 6.0)      tendency = "精密機械";
-    else if (score >= 3.0) tendency = "バランス型";
-    else                   tendency = "なんだかんだバランス型";
+  if (score === 7.9) {
+    // 1ミリのズレもない完全勝利
+    tendency = "神";
+  } else if (absAvg <= 0.3) {
+    // 中心エリア（±0.3以内）
+    if (score >= 6.0) {
+      tendency = "精密機械";
+    } else if (score >= 3.0) {
+      tendency = "バランス型";
+    } else {
+      tendency = "なんだかんだバランス型";
+    }
   } else if (avgDiff > 0.3) {
+    // 楽観エリア
     if (avgDiff >= 1.5)      tendency = "超楽観派";
     else if (avgDiff >= 1.0) tendency = "楽観派";
     else                     tendency = "やや楽観派";
   } else {
+    // 悲観エリア
     if (avgDiff <= -1.5)      tendency = "超悲観派";
     else if (avgDiff <= -1.0) tendency = "悲観派";
     else                      tendency = "やや悲観派";
