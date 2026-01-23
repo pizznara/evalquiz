@@ -14,6 +14,8 @@
             display: flex;
             justify-content: center;
             min-height: 100vh;
+            /* スマホでバウンドした時の余白を消す */
+            overscroll-behavior-y: none;
         }
         #container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
         
@@ -27,9 +29,20 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             border: 1px solid #eef0f5;
+            /* 念のため中身がはみ出さないように */
+            overflow: hidden; 
         }
 
-        .quiz-title { font-size: 32px; font-weight: 900; display: inline-flex; align-items: center; gap: 8px; margin: 0 0 15px 0; }
+        .quiz-title { 
+            font-size: 32px; 
+            font-weight: 900; 
+            display: flex; 
+            justify-content: center;
+            align-items: center; 
+            gap: 8px; 
+            margin: 0 0 15px 0; 
+            flex-wrap: wrap; /* スマホでタイトルがはみ出ないように */
+        }
         .highlight {
             background: linear-gradient(135deg, #ffcc00, #ffaa00);
             color: #fff;
@@ -38,7 +51,6 @@
             transform: rotate(-2deg);
         }
 
-        /* 標準モードバッジを少し大きく調整 */
         .badge {
             display: inline-block;
             background: #f0f2f5;
@@ -71,6 +83,8 @@
         #app {
             background: #ffffff; border-radius: 24px; padding: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center; min-height: 200px;
+            /* 下にボタンなどが隠れないように少し余白を確保 */
+            margin-bottom: 40px;
         }
         .loading { padding: 50px 0; color: #8b93a1; font-size: 14px; }
         button { font-family: 'Zen Maru Gothic', sans-serif; cursor: pointer; }
@@ -84,7 +98,6 @@
             <h1 class="quiz-title">
                 <span class="highlight">評価値</span><span class="main-text">クイズ</span>
             </h1>
-            <br>
             <div class="badge">🧮 標準モード</div>
             <p class="intro-text">
                 将棋AIの評価値にもとづいて、あなたの<b>形勢判断の精度</b>と、<br>
@@ -96,11 +109,11 @@
     <section class="rule">
         <div class="title">📘 遊び方</div>
         <ul>
-            <li>問題は全部で<b>8問</b>(ランダムに出題されます)。先手視点の形勢を<b>7つの選択肢</b>から1つ選んでください。</li>
-            <li>解答の楽観寄り／悲観寄りを平均して、<b>超悲観派〜超楽観派</b>の7段階で傾向を判定します。</li>
-            <li>精度スコアは<b>「正解＝1点」「1段階ずれ＝0.5点」「2段階以上ずれ＝0点」</b>として、全8問の合計点を出します。</li>
-            <li>評価値の算出には<b>「水匠5」</b>を使用し、<b>約5億ノード</b>読ませた時点での評価値を採用しています。</li>
-            <li>それぞれの選択肢のあいだは、<b>100点〜200点ほど間隔</b>をあけています。これは、<b>境目で迷いやすい局面を避けるため</b>です。</li>
+            <li>問題は全部で<b>8問</b>。先手視点の形勢を<b>7つの選択肢</b>から選んでください。</li>
+            <li>解答の傾向を分析し、<b>超悲観派〜超楽観派</b>の7段階で判定します。</li>
+            <li>精度スコアは<b>「正解＝1点」「1段階ずれ＝0.5点」</b>として合計点を出します。</li>
+            <li>評価値は<b>「水匠5」</b>(約5億ノード)の数値を採用しています。</li>
+            <li>境目で迷いやすい局面を避けるため、各選択肢の評価値には<b>一定の間隔</b>を設けています。</li>
         </ul>
     </section>
 
