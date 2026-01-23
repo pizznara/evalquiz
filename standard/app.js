@@ -80,9 +80,7 @@ function formatCp(cp) { return cp > 0 ? `+${cp}` : `${cp}`; }
 
 function scoreComment(score, total){
   const s = Number(score.toFixed(1));
-  // 満点（8.0）のときだけ「神」専用メッセージ
-  if (s >= total) return "全知全能の神です";
-  
+  if (s >= total) return "人間を辞めていますね。全知全能の判断力です。";
   if (s >= total - 2) return "強い！正確に形勢判断できてます！";
   if (s >= total - 3.5) return "いい感じ！";
   if (s >= total - 5) return "がんばろう！";
@@ -121,41 +119,40 @@ function renderQuiz(questions) {
   show();
 }
 
-// 判定と表示のメイン関数
 function renderResult(questions, answers) {
   const app = document.getElementById("app");
   const diffs = questions.map(q => IDX[answers[q.id]] - IDX[labelKeyFromCp(q.aiCp)]);
   const score = diffs.reduce((s, d) => s + (d === 0 ? 1 : (Math.abs(d) === 1 ? 0.5 : 0)), 0);
   const avgDiff = diffs.reduce((s, d) => s + d, 0) / questions.length;
+  const absAvg = Math.abs(avgDiff);
   const diffDisplay = avgDiff > 0 ? `+${avgDiff.toFixed(1)}` : avgDiff.toFixed(1);
 
- // --- 判定ロジックの書き換え（「神」を追加） ---
   let tendency = "";
-  const absAvg = Math.abs(avgDiff);
-
-  if (score === 7.9) {
-    // 1ミリのズレもない完全勝利
+  if (score >= 7.9) {
     tendency = "神";
   } else if (absAvg <= 0.3) {
-    // 中心エリア（±0.3以内）
-    if (score >= 6.0) {
-      tendency = "精密機械";
-    } else if (score >= 3.0) {
-      tendency = "バランス型";
-    } else {
-      tendency = "なんだかんだバランス型";
-    }
+    if (score >= 6.0)      tendency = "精密機械";
+    else if (score >= 3.0) tendency = "バランス型";
+    else                   tendency = "なんだかんだバランス型";
   } else if (avgDiff > 0.3) {
-    // 楽観エリア
     if (avgDiff >= 1.5)      tendency = "超楽観派";
     else if (avgDiff >= 1.0) tendency = "楽観派";
     else                     tendency = "やや楽観派";
   } else {
-    // 悲観エリア
     if (avgDiff <= -1.5)      tendency = "超悲観派";
     else if (avgDiff <= -1.0) tendency = "悲観派";
     else                      tendency = "やや悲観派";
   }
+
+  let specialMessage = "";
+  if (score >= 7.9) {
+    specialMessage = "\n全知全能の神";
+  } else if (tendency === "精密機械") {
+    specialMessage = "\n人間離れした正確さ"; 
+  }
+
+  const shareContent = `【形勢判断診断】\n傾向: ${tendency}\n精度: ${score.toFixed(1)} / 8.0点${specialMessage}\n#将棋 #形勢判断診断`;
+  const shareText = encodeURIComponent(shareContent);
 
   let barHtml = diffs.map((d, i) => {
     const h = Math.abs(d) * 15, isR = d > 0;
@@ -168,17 +165,6 @@ function renderResult(questions, answers) {
     </div>`;
   }).join("");
 
-  // --- シェア用テキストの構築（神と精密機械のみメッセージ追加） ---
-  let specialMessage = "";
-  if (score >= 7.9) {
-    specialMessage = "\n全知全能の神";
-  } else if (tendency === "精密機械") {
-    specialMessage = "\n人間離れした正確さ"; 
-  }
-
-  const shareContent = `【形勢判断診断】\n傾向: ${tendency}\n精度: ${score.toFixed(1)} / 8.0点${specialMessage}\n#将棋 #形勢判断診断`;
-  const shareText = encodeURIComponent(shareContent);
-  
   app.innerHTML = `
     <div style="text-align:left;">
       <div style="font-size:20px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
@@ -215,48 +201,8 @@ function renderResult(questions, answers) {
     document.getElementById("details").appendChild(item);
   });
 }
-    
-    // 親のサイズを反映
-    canvas.width = parent.clientWidth;
-    canvas.height = parent.clientHeight;
-    const w = canvas.width;
-    const h = canvas.height;
 
-    // 白背景で塗りつぶし
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
-
-    // 薄いグリッド
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.03)';
-    ctx.lineWidth = 1;
-    for(let i=0; i<w; i+=30) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,h); ctx.stroke(); }
-    for(let i=0; i<h; i+=30) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(w,i); ctx.stroke(); }
-
-    // 評価値グラフ（静止）
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(0, 191, 165, 0.4)'; // 綺麗なエメラルド
-    ctx.lineWidth = 3;
-    const data = [0.5, 0.4, 0.6, 0.3, 0.5, 0.2, 0.7, 0.4];
-    const step = w / (data.length - 1);
-    data.forEach((val, i) => {
-        const x = i * step;
-        const y = val * h;
-        if(i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    // グラフ下の塗り
-    ctx.lineTo(w, h);
-    ctx.lineTo(0, h);
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, 'rgba(0, 191, 165, 0.1)');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.fill();
-}
-
-// 起動時の処理（背景描画を消してスッキリさせた版）
+// 起動時の処理
 window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
