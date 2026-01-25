@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>形勢判断診断 - 評価値クイズ</title>
-    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Kosugi+Maru&display=swap" rel="stylesheet">
     <style>
         body { 
             margin: 0; 
@@ -37,44 +37,48 @@
         .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(0,0,0,0.2); }
         .btn:active { transform: translateY(2px); box-shadow: none; }
 
-        /* 標準モード：緑 */
         .btn-standard { background-color: #27ae60; }
-        
-        /* エキスパートモード：黒（濃いグレー） */
         .btn-expert { background-color: #2c3e50; cursor: default; }
 
-       .caption { 
-            font-size: 16px;        /* 13pxから16pxにアップ */
-            color: #444;            /* 少し濃くして読みやすく */
+        .caption { 
+            font-size: 16px; 
+            color: #444; 
             font-weight: bold; 
             margin-top: 12px; 
-            letter-spacing: 0.05em; /* 文字の間隔を少し広げて視認性向上 */
+            letter-spacing: 0.05em;
         }
 
-        /* 遊び方セクションのブラッシュアップ */
+        /* 遊び方セクション：オレンジ ＆ 丸ゴシック */
         .how-to { 
-            background: #ffffff;             /* 背景を白にして清潔感を出す */
+            background: #ffffff; 
             border-radius: 12px; 
             padding: 25px; 
-            border: 1px solid #e0e0e0;      /* 外枠は薄く */
-            border-left: 8px solid #27ae60; /* 左側に太い緑のラインを入れて視線を誘導 */
+            border: 1px solid #e0e0e0; 
+            border-left: 8px solid #f39c12; /* アクセントラインをオレンジに */
             text-align: left; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* 軽い影をつけて浮き上がらせる */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
             margin-top: 20px;
+            /* ここだけ親しみやすいフォントを適用 */
+            font-family: 'Kosugi Maru', sans-serif;
         }
         .how-to-title { 
-            text-align: left;               /* タイトルも左寄せにすると読み進めやすい */
+            text-align: left; 
             font-weight: bold; 
             margin-bottom: 15px; 
-            color: #27ae60;                 /* 文字色をテーマカラーの緑に */
+            color: #e67e22; /* 文字色を少し濃いオレンジに（読みやすさ重視） */
             font-size: 20px; 
             display: block; 
-            padding-bottom: 5px; 
         }
-        .how-to-content { font-size: 15px; color: #333; font-weight: 500; }
+        .how-to-content { font-size: 15px; color: #333; }
         .how-to-content ul { padding-left: 0; list-style: none; margin: 0; }
         .how-to-content li { margin-bottom: 12px; position: relative; padding-left: 1.5em; }
-        .how-to-content li::before { content: "・"; position: absolute; left: 0; font-weight: bold; color: #27ae60; }
+        .how-to-content li::before { 
+            content: "・"; 
+            position: absolute; 
+            left: 0; 
+            font-weight: bold; 
+            color: #f39c12; /* リストの点もオレンジに */
+        }
 
         @media (max-width: 480px) { .selection-row { flex-direction: column; gap: 30px; } }
     </style>
