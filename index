@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>形勢判断診断 - 評価値クイズ</title>
+    <style>
+        body { margin: 0; padding: 15px; font-family: sans-serif; background: transparent; color: #333; }
+        .app-container { max-width: 600px; margin: 0 auto; text-align: center; }
+        .eyecatch img { width: 100%; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .title { font-size: 22px; font-weight: bold; margin: 20px 0; }
+        .selection-row { display: flex; gap: 15px; margin-bottom: 30px; }
+        .mode-box { flex: 1; text-align: center; }
+        .btn { display: block; padding: 25px 10px; border-radius: 15px; text-decoration: none; color: white !important; font-weight: bold; font-size: 18px; margin-bottom: 8px; transition: 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+        .btn-standard { background-color: #3498db; }
+        .btn-expert { background-color: #e74c3c; }
+        .caption { font-size: 13px; color: #666; font-weight: bold; }
+        .how-to { background: #f9f9f9; border-radius: 15px; padding: 20px; border: 1px solid #eee; text-align: left; }
+        .how-to-title { text-align: center; font-weight: bold; margin-bottom: 10px; color: #555; }
+        @media (max-width: 480px) { .selection-row { flex-direction: column; } }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="eyecatch"><img src="eyecatch.jpg" alt="形勢判断診断"></div>
+    <div class="title">形勢判断診断 - 評価値クイズ</div>
+    <div class="selection-row">
+        <div class="mode-box">
+            <a href="standard/index.html" class="btn btn-standard">標準モード</a>
+            <div class="caption">7つの選択肢から選ぶ</div>
+        </div>
+        <div class="mode-box">
+            <a href="standard/index.html?mode=expert" class="btn btn-expert">エキスパートモード</a>
+            <div class="caption">評価値を当てる</div>
+        </div>
+    </div>
+    <div class="how-to">
+        <div class="how-to-title">遊び方</div>
+        <div style="font-size:14px; margin-bottom:8px;">1. 盤面を見て形勢を読み解きます</div>
+        <div style="font-size:14px; margin-bottom:8px;">2. モードに合わせて評価値を回答します</div>
+        <div style="font-size:14px;">3. AIの正解に近いほど高スコア！</div>
+    </div>
+</div>
+</body>
+</html>
