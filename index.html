@@ -5,41 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>形勢判断診断 - 評価値クイズ</title>
     <style>
-        body { margin: 0; padding: 15px; font-family: sans-serif; background: transparent; color: #333; }
+        body { margin: 0; padding: 15px; font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Meiryo", sans-serif; background: transparent; color: #333; line-height: 1.6; }
         .app-container { max-width: 600px; margin: 0 auto; text-align: center; }
-        .eyecatch img { width: 100%; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .title { font-size: 22px; font-weight: bold; margin: 20px 0; }
-        .selection-row { display: flex; gap: 15px; margin-bottom: 30px; }
-        .mode-box { flex: 1; text-align: center; }
-        .btn { display: block; padding: 25px 10px; border-radius: 15px; text-decoration: none; color: white !important; font-weight: bold; font-size: 18px; margin-bottom: 8px; transition: 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+        
+        /* アイキャッチ */
+        .eyecatch img { width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: block; margin-bottom: 30px; }
+        
+        /* モード選択エリア */
+        .selection-row { display: flex; gap: 20px; margin-bottom: 40px; }
+        .mode-box { flex: 1; display: flex; flex-direction: column; align-items: center; }
+
+        /* ボタンのデザイン */
+        .btn { 
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 80px; border-radius: 16px; 
+            text-decoration: none; color: white !important; font-weight: bold; font-size: 18px; 
+            transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.1); 
+            border: none; cursor: pointer;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(0,0,0,0.1); }
+        .btn:active { transform: translateY(2px); box-shadow: none; }
+
         .btn-standard { background-color: #3498db; }
-        .btn-expert { background-color: #e74c3c; }
-        .caption { font-size: 13px; color: #666; font-weight: bold; }
-        .how-to { background: #f9f9f9; border-radius: 15px; padding: 20px; border: 1px solid #eee; text-align: left; }
-        .how-to-title { text-align: center; font-weight: bold; margin-bottom: 10px; color: #555; }
-        @media (max-width: 480px) { .selection-row { flex-direction: column; } }
+        
+        /* エキスパートモード（赤色のまま、クリック不可設定） */
+        .btn-expert { background-color: #e74c3c; cursor: default; }
+
+        .caption { font-size: 13px; color: #666; font-weight: bold; margin-top: 10px; }
+
+        /* 遊び方セクション */
+        .how-to { background: #fdfdfd; border-radius: 16px; padding: 25px; border: 1px solid #eee; text-align: left; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .how-to-title { text-align: center; font-weight: bold; margin-bottom: 15px; color: #555; font-size: 18px; border-bottom: 2px solid #3498db; display: inline-block; width: 100%; padding-bottom: 5px; }
+        .how-to-content { font-size: 14px; color: #444; }
+        .how-to-content ul { padding-left: 0; list-style: none; margin: 0; }
+        .how-to-content li { margin-bottom: 12px; position: relative; padding-left: 1.5em; }
+        .how-to-content li::before { content: "・"; position: absolute; left: 0; font-weight: bold; color: #3498db; }
+
+        @media (max-width: 480px) { .selection-row { flex-direction: column; gap: 30px; } }
     </style>
 </head>
 <body>
+
 <div class="app-container">
-    <div class="eyecatch"><img src="shindan.png" alt="形勢判断診断"></div>
-    <div class="title">形勢判断診断 - 評価値クイズ</div>
+    <div class="eyecatch">
+        <img src="eyecatch.jpg" alt="形勢判断診断">
+    </div>
+
     <div class="selection-row">
         <div class="mode-box">
             <a href="standard/index.html" class="btn btn-standard">標準モード</a>
             <div class="caption">7つの選択肢から選ぶ</div>
         </div>
+        
         <div class="mode-box">
-            <a href="standard/index.html?mode=expert" class="btn btn-expert">エキスパートモード</a>
-            <div class="caption">評価値を当てる</div>
+            <a href="#" onclick="return false;" class="btn btn-expert">Coming Soon</a>
+            <div class="caption">Coming soon</div>
         </div>
     </div>
+
     <div class="how-to">
         <div class="how-to-title">遊び方</div>
-        <div style="font-size:14px; margin-bottom:8px;">1. 盤面を見て形勢を読み解きます</div>
-        <div style="font-size:14px; margin-bottom:8px;">2. モードに合わせて評価値を回答します</div>
-        <div style="font-size:14px;">3. AIの正解に近いほど高スコア！</div>
+        <div class="how-to-content">
+            <ul>
+                <li>問題は全部で8問(ランダムで出題されます)。全て先手番です。評価値を予想してください。</li>
+                <li>解答の傾向を分析し、超悲観派〜超楽観派の7段階で判定します。</li>
+                <li>評価値の算出には「水匠5」を使用し、約5億ノード読ませた時点での評価値を採用しています。</li>
+            </ul>
+        </div>
     </div>
 </div>
+
 </body>
 </html>
