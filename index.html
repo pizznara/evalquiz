@@ -45,9 +45,27 @@
 
         .caption { font-size: 13px; color: #666; font-weight: bold; margin-top: 10px; }
 
-        .how-to { background: #fdfdfd; border-radius: 16px; padding: 25px; border: 1px solid #eee; text-align: left; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-        .how-to-title { text-align: center; font-weight: bold; margin-bottom: 15px; color: #555; font-size: 18px; border-bottom: 2px solid #27ae60; display: inline-block; width: 100%; padding-bottom: 5px; }
-        .how-to-content { font-size: 14px; color: #444; }
+        /* 遊び方セクションのブラッシュアップ */
+        .how-to { 
+            background: #ffffff;             /* 背景を白にして清潔感を出す */
+            border-radius: 12px; 
+            padding: 25px; 
+            border: 1px solid #e0e0e0;      /* 外枠は薄く */
+            border-left: 8px solid #27ae60; /* 左側に太い緑のラインを入れて視線を誘導 */
+            text-align: left; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* 軽い影をつけて浮き上がらせる */
+            margin-top: 20px;
+        }
+        .how-to-title { 
+            text-align: left;               /* タイトルも左寄せにすると読み進めやすい */
+            font-weight: bold; 
+            margin-bottom: 15px; 
+            color: #27ae60;                 /* 文字色をテーマカラーの緑に */
+            font-size: 20px; 
+            display: block; 
+            padding-bottom: 5px; 
+        }
+        .how-to-content { font-size: 15px; color: #333; font-weight: 500; }
         .how-to-content ul { padding-left: 0; list-style: none; margin: 0; }
         .how-to-content li { margin-bottom: 12px; position: relative; padding-left: 1.5em; }
         .how-to-content li::before { content: "・"; position: absolute; left: 0; font-weight: bold; color: #27ae60; }
