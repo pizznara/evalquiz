@@ -113,6 +113,17 @@
         </div>
     </div>
 </div>
+<script>
+    // 自分の高さを親(WordPress)に伝える関数
+    const sendHeight = () => {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({ type: 'resize', height: height }, '*');
+    };
 
+    // 読み込み時、リサイズ時、および少し遅れて実行（フォント読み込み対策）
+    window.addEventListener('load', sendHeight);
+    window.addEventListener('resize', sendHeight);
+    setTimeout(sendHeight, 500); // 念のため0.5秒後にもう一度送る
+</script>
 </body>
 </html>
