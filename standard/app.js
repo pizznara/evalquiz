@@ -99,7 +99,7 @@ function renderQuiz(questions) {
     const largeImgPath = DATA_DIR + q.large;
     app.innerHTML = `
       <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">問題 ${idx + 1} / ${questions.length}</div>
-      <img src="${largeImgPath}" style="max-width:100%;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.1);margin-bottom:15px;">
+      <img src="${largeImgPath}" style="max-width:100%;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,0.1);margin-bottom:15px;">
       <div style="font-size:15px;font-weight:700;margin-bottom:15px;">この局面の形勢は？（先手番）</div>
       <div id="btns"></div>
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
