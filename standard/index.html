@@ -100,20 +100,29 @@
     margin-bottom: 5px;
 }
 
-/* 下の行：大きめ・オレンジ */
-/* 下の行：立体感のあるオレンジバッジ風 */
 .main-title {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 900;
-    color: #fff; /* 文字色は白 */
-    background: linear-gradient(135deg, #f39c12, #e67e22); /* オレンジのグラデーション */
-    padding: 8px 24px;
-    border-radius: 16px;
-    display: inline-block; /* 文字の幅に合わせる */
-    box-shadow: 0 4px 0 #d35400; /* 濃いオレンジで厚みを出す */
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    transform: rotate(-1deg); /* ほんの少し傾けて動きを出す */
-    margin-top: 5px;
+    color: #f39c12; /* メインカラーのオレンジ */
+    text-shadow: 
+        1px 1px 0 #fff, -1px -1px 0 #fff,
+        1px -1px 0 #fff, -1px 1px 0 #fff,
+        0 4px 0 rgba(243, 156, 18, 0.3); /* 下方向に柔らかい影 */
+    letter-spacing: 2px;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* 下にアクセントの太線を引く */
+.main-title::after {
+    content: "";
+    display: block;
+    width: 60%;
+    height: 4px;
+    background: #f39c12;
+    margin: 4px auto 0;
+    border-radius: 2px;
 }
 
 /* スマホでの調整 */
