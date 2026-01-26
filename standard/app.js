@@ -143,6 +143,7 @@ function renderQuiz(questions) {
 }
 
 function renderResult(questions, answers) {
+  window.parent.postMessage({ type: 'scrollToTop' }, '*');
   const rules = document.getElementById('rules-section');
   if (rules) rules.style.display = 'none';
   const app = document.getElementById("app");
