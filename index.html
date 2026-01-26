@@ -80,31 +80,11 @@
             color: #f39c12; /* リストの点もオレンジに */
         }
 
-        /* 左上の戻るボタン */
-.home-link {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    text-decoration: none;
-    color: #666;
-    font-size: 14px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    z-index: 100; /* 他の要素より上に表示 */
-}
-.home-link:hover {
-    color: #27ae60; /* 標準モードのテーマ色（緑）に合わせる */
-}
-
         @media (max-width: 480px) { .selection-row { flex-direction: column; gap: 30px; } }
     </style>
 </head>
 <body>
-<a href="../index.html" class="home-link">
-        <span>← 戻る</span>
-    </a>
+
 <div class="app-container">
     <div class="eyecatch">
         <img src="shindan.png" alt="形勢判断診断">
