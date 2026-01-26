@@ -231,12 +231,21 @@ window.onload = () => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
 
-    // --- ここから追加：高さ自動調整 ---
-    // 1. 読み込み完了時に一度高さを送る
+    // 1. 読み込み完了時に一度送る
     sendHeight();
     
-    // 2. 画面の中身（問題の切り替えなど）が変わるたびに高さを自動再送する
-    const observer = new MutationObserver(sendHeight);
+    // 2. 画面の中身が変わるたびに送る（MutationObserver）
+    const observer = new MutationObserver(() => {
+        sendHeight();
+        // 中に画像があれば、その画像が読み終わった時にも再計算させる
+        document.querySelectorAll('#app img').forEach(img => {
+            if (!img.complete) {
+                img.onload = sendHeight;
+            }
+        });
+    });
     observer.observe(document.body, { childList: true, subtree: true });
-    // --- ここまで ---
+
+    // 3. ウィンドウのサイズが変わった時（スマホの回転など）にも対応
+    window.addEventListener('resize', sendHeight);
 };
