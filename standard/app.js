@@ -177,8 +177,8 @@ function renderResult(questions, answers) {
     specialMessage = "\n人間離れした正確さ"; 
   }
 
-  const shareContent = `【形勢判断診断】\n傾向: ${tendency}\n精度: ${score.toFixed(1)} / 8.0点${specialMessage}\n#将棋 #形勢判断診断`;
-  const shareText = encodeURIComponent(shareContent);
+ const shareContent = `【形勢判断診断】\n傾向: ${tendency} (平均${diffDisplay})\n精度: ${score.toFixed(1)} / 8.0点${specialMessage}\n#将棋 #形勢判断診断`;
+const shareText = encodeURIComponent(shareContent);
 
   let barHtml = diffs.map((d, i) => {
     const h = Math.abs(d) * 15, isR = d > 0;
