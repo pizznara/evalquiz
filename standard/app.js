@@ -192,7 +192,7 @@ function renderResult(questions, answers) {
 
   app.innerHTML = `
     <div style="text-align:left;">
-      <div style="font-size:20px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
+      <div style="font-size:28px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
       <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:12px;margin-bottom:15px;">
         ${pill("🎯 精度スコア", `${score.toFixed(1)} <span style="font-size:14px; font-weight:700;">/ 8.0</span>`)}
         ${pill("🧭 判定", `${tendency} <span style="font-size:14px; font-weight:700;">(平均${diffDisplay})</span>`)}
