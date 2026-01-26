@@ -108,9 +108,24 @@ function renderQuiz(questions) {
       const b = document.createElement("button");
       b.textContent = info.label;
       b.style.cssText = `display:block;width:100%;margin:8px 0;padding:12px;border-radius:12px;border:2px solid ${labelBorderColor(info.key)};background:${labelBgColor(info.key)};font-family:inherit;font-weight:700;text-align:left;transition:0.1s;`;
-      b.onclick = () => { 
-        answers[q.id] = info.key; 
-        if(++idx < questions.length) show(); else renderResult(questions, answers); 
+     b.onclick = () => { 
+        // 1. 全てのボタンを押せないようにし、選んだボタンを強調する
+        const allButtons = document.querySelectorAll("#btns button");
+        allButtons.forEach(btn => btn.style.pointerEvents = "none"); // 連続クリック防止
+        
+        b.style.filter = "brightness(1.2)"; // 選んだボタンを少し光らせる
+        b.style.transform = "scale(0.98)";   // 少し押し込まれた感じにする
+        b.style.borderColor = "#f39c12";    // 枠線をオレンジにする（お好みで）
+
+        // 2. 0.2秒待ってから処理を実行
+        setTimeout(() => {
+          answers[q.id] = info.key; 
+          if(++idx < questions.length) {
+            show(); 
+          } else {
+            renderResult(questions, answers);
+          }
+        }, 200); // ここで0.2秒（200ms）待機
       };
       document.getElementById("btns").appendChild(b);
     });
