@@ -6,6 +6,21 @@
     <title>形勢判断！評価値クイズ</title>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
     <style>
+
+        /* クイズ画面専用：左上の戻るボタン */
+.home-link {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    text-decoration: none;
+    color: #888; /* 控えめなグレー */
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 1000;
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.8); /* 背景を少し白くして見やすく */
+    border-radius: 5px;
+}
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
             background-color: #f0f2f5;
@@ -92,7 +107,7 @@
     </style>
 </head>
 <body>
-
+<a href="../index.html" class="home-link">← 戻る</a>
 <div id="container">
     <header class="quiz-header">
         <div class="header-card">
