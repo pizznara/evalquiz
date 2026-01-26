@@ -219,10 +219,24 @@ function renderResult(questions, answers) {
   });
 }
 
+// 画面の高さが変わるたびに、親（WordPress）に高さを伝える関数
+const sendHeight = () => {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ type: 'resize', height: height }, '*');
+};
+
 // 起動時の処理
 window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
 
-}
+    // --- ここから追加：高さ自動調整 ---
+    // 1. 読み込み完了時に一度高さを送る
+    sendHeight();
+    
+    // 2. 画面の中身（問題の切り替えなど）が変わるたびに高さを自動再送する
+    const observer = new MutationObserver(sendHeight);
+    observer.observe(document.body, { childList: true, subtree: true });
+    // --- ここまで ---
+};
