@@ -101,28 +101,16 @@
 }
 
 .main-title {
-    font-size: 30px;
+    font-size: 26px;
     font-weight: 900;
-    color: #f39c12; /* メインカラーのオレンジ */
-    text-shadow: 
-        1px 1px 0 #fff, -1px -1px 0 #fff,
-        1px -1px 0 #fff, -1px 1px 0 #fff,
-        0 4px 0 rgba(243, 156, 18, 0.3); /* 下方向に柔らかい影 */
-    letter-spacing: 2px;
-    position: relative;
-    display: inline-block;
-    padding-bottom: 5px;
-}
-
-/* 下にアクセントの太線を引く */
-.main-title::after {
-    content: "";
-    display: block;
-    width: 60%;
-    height: 4px;
+    color: #fff;
     background: #f39c12;
-    margin: 4px auto 0;
-    border-radius: 2px;
+    padding: 10px 30px;
+    border-radius: 50px; /* カプセル型の丸み */
+    display: inline-block;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+    border-bottom: 4px solid #d35400; /* 下側だけ濃くして立体感を出す */
+    letter-spacing: 1px;
 }
 
 /* スマホでの調整 */
