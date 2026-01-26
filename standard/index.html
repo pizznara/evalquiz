@@ -49,24 +49,6 @@
     z-index: 1;
         }
 
-        .quiz-title { 
-            font-size: 32px; 
-            font-weight: 900; 
-            display: flex; 
-            justify-content: center;
-            align-items: center; 
-            gap: 8px; 
-            margin: 0 0 15px 0; 
-            flex-wrap: wrap; /* スマホでタイトルがはみ出ないように */
-        }
-        .highlight {
-            background: linear-gradient(135deg, #ffcc00, #ffaa00);
-            color: #fff;
-            padding: 4px 16px; border-radius: 16px;
-            box-shadow: 0 4px 0 #d48a00; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-            transform: rotate(-2deg);
-        }
-
         .badge {
             display: inline-block;
             background: #f0f2f5;
@@ -104,6 +86,33 @@
         }
         .loading { padding: 50px 0; color: #8b93a1; font-size: 14px; }
         button { font-family: 'Zen Maru Gothic', sans-serif; cursor: pointer; }
+
+        .header-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 上の行：小さめ */
+.sub-title {
+    font-size: 16px;
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* 下の行：大きめ・オレンジ */
+.main-title {
+    font-size: 28px;
+    color: #f39c12; /* トップページのボタン色と統一 */
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+/* スマホでの調整 */
+@media (max-width: 480px) {
+    .main-title { font-size: 24px; }
+    .sub-title { font-size: 14px; }
+}
     </style>
 </head>
 <body>
@@ -112,9 +121,10 @@
     <header class="quiz-header">
         <div class="header-card">
              
-            <h1 class="quiz-title">
-                <span class="highlight">評価値</span><span class="main-text">クイズ</span>
-            </h1>
+           <div class="header-container">
+    <div class="sub-title">評価値を予想しよう！</div>
+    <div class="main-title">形勢判断診断</div>
+</div>
             <div class="badge">🧮 標準モード</div>
             <p class="intro-text">
                 将棋AIの評価値にもとづいて、あなたの<b>形勢判断の精度</b>と、<br>
