@@ -201,7 +201,7 @@ function renderResult(questions, answers) {
       <div style="margin:10px 0 35px;padding:15px 5px;background:#f8f9fa;border:3px solid #e9ecef;border-radius:12px;">
         <div style="display:flex;align-items:flex-end;height:100px;background:linear-gradient(to bottom, transparent 49.5%, #dee2e6 49.5%, #dee2e6 50.5%, transparent 50.5%);">${barHtml}</div>
       </div>
-     <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText + '\nhttps://shogicobin.com/evaluation-quiz')}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;">
+    <a href="https://twitter.com/intent/tweet?text=${shareText}%0Ahttps://shogicobin.com/evaluation-quiz" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;">
   <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
   結果をXでポストする
 </a>
