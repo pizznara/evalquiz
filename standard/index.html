@@ -117,6 +117,22 @@
     letter-spacing: 1px;
 }
 
+        /* 選択肢ボタンのホバー演出 */
+button, .option-button {
+    transition: all 0.2s ease; /* 変化をなめらかにする */
+}
+
+button:hover, .option-button:hover {
+    transform: translateY(-3px); /* 3ピクセル上に浮かす */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* 影を少し強くして浮遊感を出す */
+    filter: brightness(1.05); /* ほんの少しだけ明るくする */
+}
+
+button:active, .option-button:active {
+    transform: translateY(-1px); /* 押した瞬間に少し沈ませる */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 /* スマホでの調整 */
 @media (max-width: 480px) {
     .main-title { font-size: 24px; }
