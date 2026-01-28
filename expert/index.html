@@ -3,134 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>形勢判断！評価値クイズ エキスパート</title>
+    <title>形勢判断！評価値クイズ</title>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Zen Maru Gothic', sans-serif;
-            background-color: #1a1c1e; /* 背景を少し暗く */
-            color: #e1e2e5;
+            background-color: transparent;
+            color: #1f2328;
             margin: 0;
             display: flex;
             justify-content: center;
             min-height: 100vh;
+            /* スマホでバウンドした時の余白を消す */
             overscroll-behavior-y: none;
         }
         #container { 
-            width: 100%; 
-            max-width: 500px; 
-            padding: 20px; 
-            box-sizing: border-box; 
-            position: relative;
-            margin: 0 auto;
-        }
+    width: 100%; 
+    max-width: 550px; 
+    padding: 0px; 
+    box-sizing: border-box; 
+    position: relative; /* 子要素の基準にする */
+    margin: 0 auto; /* PCで中央に寄せる */
+}
         
         .quiz-header { text-align: center; margin-bottom: 20px; }
 
-        /* ヘッダーカードをダーク調に */
+        /* タイトルから導入文までを包むメインカード */
         .header-card {
-            background: #25292e;
+            background: #ffffff;
             border-radius: 24px;
             padding: 25px 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            border: 1px solid #383d44;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid #eef0f5;
+            overflow: hidden; 
             position: relative; 
-            z-index: 1;
-        }
-
-        .header-container { margin-bottom: 20px; text-align: center; }
-        .sub-title { font-size: 16px; color: #aeb4be; font-weight: bold; margin-bottom: 5px; }
-
-        .main-title-link { text-decoration: none; display: inline-block; transition: 0.2s; }
-        .main-title-link:hover { transform: translateY(-2px); filter: brightness(1.1); }
-
-        /* タイトルバッジ：エキスパートは黒×金っぽいオレンジ */
-        .main-title {
-            font-size: 30px;
-            font-weight: 900;
-            color: #fff;
-            background: #e67e22;
-            padding: 10px 30px;
-            border-radius: 50px;
-            box-shadow: 0 4px 0 #b35900;
-            letter-spacing: 1px;
+    z-index: 1;
         }
 
         .badge {
             display: inline-block;
-            background: #383d44;
+            background: #f0f2f5;
             padding: 6px 16px;
             border-radius: 20px;
             font-size: 14px;
             font-weight: 900;
-            color: #ffcc00; /* 金色っぽい色 */
+            color: #5b6572;
             margin-bottom: 20px;
-            border: 1px solid #4d535b;
+            border: 1px solid #e1e4e8;
         }
 
-        .intro-text { color: #aeb4be; font-size: 14px; line-height: 1.6; margin: 0; }
+        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.6; margin: 0; }
 
-        /* 遊び方セクションもダークに */
         .rule {
-            background: #25292e;
+            background: #ffffff;
             border-radius: 20px;
             padding: 18px;
             margin-bottom: 20px;
             text-align: left;
-            border: 1px solid #383d44;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid #eef0f5;
         }
-        .rule .title { font-weight: 900; color: #fff; margin-bottom: 8px; font-size: 16px; }
-        .rule ul { margin: 0; padding: 0; list-style: none; font-size: 13px; color: #aeb4be; line-height: 1.5; }
+        .rule .title { font-weight: 900; color: #1f2328; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+        .rule ul { margin: 0; padding: 0; list-style: none; font-size: 13px; color: #5b6572; line-height: 1.5; }
         .rule li { position: relative; padding-left: 18px; margin-bottom: 6px; }
-        .rule li::before { content: "◆"; position: absolute; left: 0; color: #ffcc00; }
+        .rule li::before { content: "•"; position: absolute; left: 0; color: #ffaa00; font-weight: bold; }
+        .rule b { color: #1f2328; font-weight: 900; }
 
         #app {
-            background: #ffffff; /* クイズ部分は見やすさ優先で白を維持、または好みの色に */
-            border-radius: 24px; padding: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center;
-            color: #1f2328; /* 中の文字は黒に戻す */
+            background: #ffffff; border-radius: 24px; padding: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center; min-height: 200px;
+            /* 下にボタンなどが隠れないように少し余白を確保 */
             margin-bottom: 40px;
         }
-        
         .loading { padding: 50px 0; color: #8b93a1; font-size: 14px; }
-        
-        /* スマホ調整 */
-        @media (max-width: 480px) {
-            .main-title { font-size: 24px; }
-            .sub-title { font-size: 14px; }
-        }
+        button { font-family: 'Zen Maru Gothic', sans-serif; cursor: pointer; }
+
+        .header-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 上の行：小さめ */
+.sub-title {
+    font-size: 16px;
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* タイトルのリンク設定 */
+.main-title-link {
+    text-decoration: none; /* 下線を消す */
+    display: inline-block;
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.main-title-link:hover {
+    transform: translateY(-2px); /* 少し浮き上がらせる */
+    filter: brightness(1.1);    /* 少し明るくする */
+}
+
+/* 案2：モダンなバッジ型デザイン（再調整版） */
+.main-title {
+    font-size: 30px;
+    font-weight: 900;
+    color: #fff;
+    background: #f39c12;
+    padding: 10px 30px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+    border-bottom: 4px solid #d35400;
+    letter-spacing: 1px;
+}
+
+        /* 選択肢ボタンのホバー演出 */
+button, .option-button {
+    transition: all 0.2s ease; /* 変化をなめらかにする */
+}
+
+button:hover, .option-button:hover {
+    transform: translateY(-3px); /* 3ピクセル上に浮かす */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* 影を少し強くして浮遊感を出す */
+    filter: brightness(1.05); /* ほんの少しだけ明るくする */
+}
+
+button:active, .option-button:active {
+    transform: translateY(-1px); /* 押した瞬間に少し沈ませる */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* スマホでの調整 */
+@media (max-width: 480px) {
+    .main-title { font-size: 24px; }
+    .sub-title { font-size: 14px; }
+    #container { padding: 0px; } /* スマホではさらに余白を削る */
+    #app, .header-card, .rule {
+        border-radius: 12px; /* 角丸を少し控えめにすると横幅が広く見える */
+}
+    }
     </style>
 </head>
 <body>
 <div id="container">
     <header class="quiz-header">
         <div class="header-card">
-            <div class="header-container">
-                <div class="sub-title">真の形勢を読み解け</div>
-                <a href="../index.html" class="main-title-link">
-                    <div class="main-title">形勢判断診断</div>
-                </a>
-            </div>
-            <div class="badge">🔥 エキスパートモード</div>
+             
+         <div class="header-container">
+    <div class="sub-title">評価値を予想しよう！</div>
+    <a href="../index.html" class="main-title-link">
+        <div class="main-title">形勢判断診断</div>
+    </a>
+</div>
+            <div class="badge">🧮 標準モード</div>
             <p class="intro-text">
-                選択肢はありません。あなたの感覚で<br>
-                <b>評価値を直接指定</b>する超上級者向けモードです。
+                将棋AIの評価値にもとづいて、あなたの<b>形勢判断の精度</b>と、<br>
+                <b>楽観／悲観の傾向</b>を診断します。
             </p>
         </div>
     </header>
 
     <section id="rules-section" class="rule">
-        <div class="title">🏆 エキスパートの掟</div>
+        <div class="title">📘 遊び方</div>
         <ul>
-            <li>全8問。スライダーを動かして「ここだ！」と思う評価値を設定してください。</li>
-            <li>AIの評価値との<b>「誤差」</b>がそのままスコアになります。</li>
-            <li>わずかなズレも許されない、極限の精度が求められます。</li>
+            <li>問題は全部で<b>8問</b>(ランダムで出題されます)。先手視点の形勢を<b>7つの選択肢</b>から選んでください。全て先手番です。</li>
+            <li>解答の傾向を分析し、<b>超悲観派〜超楽観派</b>の7段階で判定します。</li>
+            <li>精度スコアは<b>「正解＝1点」「1段階ずれ＝0.5点」</b>として合計点を出します。</li>
+             <li>評価値の算出には<b>「水匠5」</b>を使用し、<b>約5億ノード</b>読ませた時点での評価値を採用しています。</li>
+            <li>境目で迷いやすい局面を避けるため、各選択肢の評価値には<b>100点～200点の間隔</b>を設けています。</li>
         </ul>
     </section>
 
     <div id="app">
-        <div class="loading">エキスパート用データを読み込み中...</div>
+        <div class="loading">問題データを読み込み中...</div>
     </div>
 </div>
 
