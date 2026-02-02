@@ -1,14 +1,13 @@
 const DATA_DIR = "../data/";
 const MANIFEST_URL = DATA_DIR + "manifest.json";
 
-// エキスパート用：結果コメント
-function scoreComment(score) {
-  const s = Number(score);
-  if (s >= 95) return "将棋星人級の精度です。ソフトと同期していますね。";
-  if (s >= 85) return "素晴らしい形勢判断！有段者の中でも一際鋭いです。";
-  if (s >= 70) return "なかなかの精度です。勝負どころを捉えています。";
-  if (s >= 50) return "平均的な形勢判断です。さらに磨きをかけましょう！";
-  return "伸びしろたっぷりです！繰り返し挑戦して感覚を掴みましょう。";
+// 精度スコアが90点以上の時のみ表示される特別なコメント
+function getSpecialComment(score) {
+  const s = parseFloat(score);
+  if (s >= 99) return "将棋の神";
+  if (s >= 95) return "正確無比！人間離れした形勢判断力！";
+  if (s >= 90) return "すごい！形勢判断のプロ！";
+  return "";
 }
 
 function pill(label, value){
@@ -95,30 +94,28 @@ function renderResult(questions, answers) {
   if (rules) rules.style.display = 'none';
   const app = document.getElementById("app");
   
-  // 1. 各問の誤差と重み付き誤差の計算
   const results = questions.map(q => {
     const user = answers[q.id];
     const ai = q.aiCp;
     const rawDiff = user - ai;
-    // グラデーション重み: W = 1 / (1 + (cp/1000)^2)
     const weight = 1 / (1 + Math.pow(Math.abs(ai) / 1000, 2));
     const weightedAbsDiff = Math.abs(rawDiff) * weight;
     return { rawDiff, weightedAbsDiff, user, ai };
   });
 
-  // 2. 統計値
   const avgDiff = results.reduce((s, r) => s + r.rawDiff, 0) / questions.length;
   const avgWeightedAbsDiff = results.reduce((s, r) => s + r.weightedAbsDiff, 0) / questions.length;
-  
-  // 3. スコア計算 (100 - 補正後平均誤差/20)
   const score = Math.max(0, 100 - (avgWeightedAbsDiff / 20)).toFixed(1);
   const diffDisplay = avgDiff > 0 ? `+${avgDiff.toFixed(0)}` : avgDiff.toFixed(0);
 
-  // 4. 判定 (平均ズレ ±300以内がフラット)
   let tendency = "";
   if (Math.abs(avgDiff) <= 300) tendency = "フラット";
   else if (avgDiff > 300) tendency = avgDiff > 1000 ? "超楽観派" : "楽観派";
   else tendency = avgDiff < -1000 ? "超悲観派" : "悲観派";
+
+  // 特別コメント（90点以上の時だけ表示）
+  const specialMsg = getSpecialComment(score);
+  const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;">💬 ${specialMsg}</div>` : "";
 
   const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} (平均ズレ${diffDisplay})\n精度スコア: ${score}点\n#将棋 #形勢判断診断`;
   const shareText = encodeURIComponent(shareContent);
@@ -128,9 +125,9 @@ function renderResult(questions, answers) {
       <div style="font-size:35px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
         ${pill("🎯 精度スコア", `${score} <span style="font-size:14px; font-weight:700;">点</span>`)}
-        ${pill("🧭 判定", `${tendency}`)}
+        ${pill("🧭 判定", `${tendency} <span style="font-size:14px; font-weight:700;">(${diffDisplay})</span>`)}
       </div>
-      <div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;">💬 ${scoreComment(score)}</div>
+      ${commentHtml}
       
       <a href="https://twitter.com/intent/tweet?text=${shareText}%0Ahttps://shogicobin.com/evaluation-quiz" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;">
         <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
@@ -139,7 +136,7 @@ function renderResult(questions, answers) {
 
       <div style="font-size:14px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;">
         <span>各問の分析</span>
-        <span style="color:#8b93a1;font-size:11px;">※青：AIの正解 / 赤：あなたの予想</span>
+        <span style="color:#8b93a1;font-size:11px;">※太線：正解 / 細線：予想</span>
       </div>
       <div id="details"></div>
       <button onclick="location.reload()" style="width:100%;padding:14px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;">もう一度挑戦する</button>
@@ -151,32 +148,35 @@ function renderResult(questions, answers) {
     const thumbImgPath = DATA_DIR + q.thumb;
     const largeImgPath = DATA_DIR + q.large;
     
-    // ゲージ上での位置計算 (-3000〜3000を0〜100%に変換)
     const aiPos = ((r.ai + 3000) / 6000) * 100;
     const userPos = ((r.user + 3000) / 6000) * 100;
+    
+    // 悲観側なら青、楽観側なら赤
+    const barStart = Math.min(aiPos, userPos);
+    const barWidth = Math.abs(aiPos - userPos);
+    const barColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
 
     const item = document.createElement("div");
     item.style.cssText = `margin-bottom:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #eee;display:flex;gap:12px;align-items:center;`;
     item.innerHTML = `
       <img src="${thumbImgPath}" onclick="this.src=this.src==='${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;transition:0.2s;">
       <div style="flex:1;">
-        <div style="font-size:12px; font-weight:700; margin-bottom:8px;">第${i+1}問: 誤差 ${r.rawDiff > 0 ? '+' : ''}${r.rawDiff}</div>
+        <div style="font-size:12px; font-weight:700; margin-bottom:8px;">第${i+1}問 <span style="color:#1f2328; font-weight:900;">(正解: ${r.ai > 0 ? '+':''}${r.ai})</span></div>
         
-        <div style="height:6px; background:#f0f0f5; border-radius:3px; position:relative; margin:10px 0;">
-          <div style="position:absolute; left:${aiPos}%; width:4px; height:12px; top:-3px; background:#2c49a8; border-radius:2px; transform:translateX(-50%); z-index:2;" title="AI: ${r.ai}"></div>
-          <div style="position:absolute; left:${userPos}%; width:4px; height:12px; top:-3px; background:#e85b5b; border-radius:2px; transform:translateX(-50%); z-index:3;" title="あなた: ${r.user}"></div>
+        <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative; margin:12px 0;">
+          <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${barColor}; opacity:0.35; border-radius:4px;"></div>
+          <div style="position:absolute; left:${aiPos}%; width:5px; height:16px; top:-4px; background:#1f2328; border-radius:2px; transform:translateX(-50%); z-index:3;"></div>
+          <div style="position:absolute; left:${userPos}%; width:2px; height:12px; top:-2px; background:#1f2328; transform:translateX(-50%); z-index:4;"></div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:#5b6572; font-weight:700;">
-          <span>予想: ${r.user > 0 ? '+':''}${r.user}</span>
-          <span>正解: ${r.ai > 0 ? '+':''}${r.ai}</span>
+        <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700;">
+          <span style="color:#5b6572;">予想: ${r.user > 0 ? '+':''}${r.user} <span style="margin-left:5px; color:${barColor};">誤差: ${r.rawDiff > 0 ? '+':''}${r.rawDiff}</span></span>
         </div>
       </div>`;
     document.getElementById("details").appendChild(item);
   });
 }
 
-// 既存のsendHeightとwindow.onloadは流用
 const sendHeight = () => {
     const height = document.documentElement.scrollHeight;
     window.parent.postMessage({ type: 'resize', height: height }, '*');
