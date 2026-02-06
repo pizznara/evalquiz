@@ -25,9 +25,9 @@ function getRank(score) {
 // 精度スコアに応じた特別なコメント
 function getSpecialComment(score) {
   const s = parseFloat(score);
-  if (s >= 99) return "全知全能の判断力。あなたはもう、人間ではありません。";
-  if (s >= 97) return "一世を風靡する名人の如き大局観。恐れ入りました。";
-  if (s >= 90) return "プロ級の審美眼！素晴らしい精度です。";
+  if (s >= 99) return "全知全能の大局観。将棋の神です。";
+  if (s >= 97) return "名人の如き大局観。恐れ入りました。";
+  if (s >= 90) return "プロ級の大局観！素晴らしい精度です。";
   if (s >= 70) return "強い！安定した実力を持っています。";
   if (s < 50) return "まずは盤面全体を広く見る練習から始めましょう！";
   return "";
@@ -142,7 +142,7 @@ function renderResult(questions, answers) {
   const specialMsg = getSpecialComment(score);
   const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;font-size:15px;">💬 ${specialMsg}</div>` : "";
 
-  const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度スコア: ${score}点 (${rank})\n#将棋 #形勢判断診断`;
+  const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度: ${score}点 (${rank})\n#形勢判断診断`;
   const shareText = encodeURIComponent(shareContent);
 
   app.innerHTML = `
@@ -161,7 +161,7 @@ function renderResult(questions, answers) {
 
       <div style="font-size:15px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;">
         <span>各問の分析</span>
-        <span style="color:#8b93a1;font-size:12px;">※赤丸：正解 / 黒太線：あなたの予想</span>
+        <span style="color:#8b93a1;font-size:12px;">※赤丸：正解 / 黒線：あなたの予想</span>
       </div>
       <div id="details"></div>
       <button onclick="location.reload()" style="width:100%;padding:16px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;font-size:16px;">もう一度挑戦する</button>
