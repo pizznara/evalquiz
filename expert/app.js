@@ -108,7 +108,7 @@ function renderResult(questions, answers) {
   const score = Math.max(0, 100 - (avgWeightedAbsDiff / 20)).toFixed(1);
   
   const diffSign = avgDiff >= 0 ? "+" : "";
-  const diffDisplay = `(${diffSign}${avgDiff.toFixed(0)})`;
+  const diffDisplay = `(平均${diffSign}${avgDiff.toFixed(0)})`;
 
   let tendency = "";
   if (Math.abs(avgDiff) <= 300) tendency = "フラット";
@@ -126,7 +126,7 @@ function renderResult(questions, answers) {
       <div style="font-size:35px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
         ${pill("🎯 精度スコア", `<span style="font-size:32px; font-weight:900;">${score}</span> <span style="font-size:14px; font-weight:700;">点</span>`)}
-        ${pill("🧭 判定", `<span style="font-size:20px; font-weight:900;">${tendency}</span><br><span style="font-size:16px; font-weight:700; color:#5b6572;">${diffDisplay}</span>`)}
+        ${pill("🧭 判定", `<div style="margin-top:8px;"><span style="font-size:20px; font-weight:900;">${tendency}</span><br><span style="font-size:12px; font-weight:700; color:#5b6572;">${diffDisplay}</span></div>`)}
       </div>
       ${commentHtml}
       
@@ -162,14 +162,14 @@ function renderResult(questions, answers) {
     if (absDiff === 0) feedback = '<span style="color:#f39c12; margin-left:8px;">★ピタリ！</span>';
     else if (absDiff <= 100) feedback = '<span style="color:#27ae60; margin-left:8px;">👍いいね！</span>';
 
-    // 1000ごとのメモリと数値
+    // 1000ごとのメモリと数値（見やすく調整）
     const tickValues = [-2000, -1000, 0, 1000, 2000];
     const ticks = tickValues.map(v => {
       const pos = ((v + 3000) / 6000) * 100;
       const label = (v === 0) ? "0" : (v > 0 ? `+${v}` : v);
       return `
-        <div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#d1d5db; z-index:1;"></div>
-        <div style="position:absolute; left:${pos}%; top:8px; transform:translateX(-50%); font-size:8px; color:#bcbec4; font-weight:700; z-index:1;">${label}</div>
+        <div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#9ca3af; z-index:1;"></div>
+        <div style="position:absolute; left:${pos}%; top:8px; transform:translateX(-50%); font-size:10px; color:#4b5563; font-weight:800; z-index:1;">${label}</div>
       `;
     }).join("");
 
@@ -180,7 +180,7 @@ function renderResult(questions, answers) {
       <div style="flex:1;">
         <div style="font-size:12px; font-weight:700; margin-bottom:8px;">第${i+1}問 <span style="color:#1f2328; font-weight:900;">(正解: ${r.ai > 0 ? '+':''}${r.ai})</span>${feedback}</div>
         
-        <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative; margin:15px 0 18px 0;">
+        <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative; margin:15px 0 20px 0;">
           ${ticks}
           <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3; border-radius:4px;"></div>
           <div style="position:absolute; left:${aiPos}%; width:12px; height:12px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:4; box-shadow:0 0 4px rgba(232,91,91,0.5);"></div>
