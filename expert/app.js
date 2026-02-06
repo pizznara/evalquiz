@@ -126,7 +126,7 @@ function renderResult(questions, answers) {
       <div style="font-size:35px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
         ${pill("🎯 精度スコア", `<div style="margin:4px 0;"><span style="font-size:32px; font-weight:900;">${score}</span> <span style="font-size:14px; font-weight:700;">点</span></div>`)}
-        ${pill("🧭 判定", `<div style="margin:12px 0;"><span style="font-size:18px; font-weight:900;">${tendency}</span><span style="font-size:11px; font-weight:700; color:#5b6572; margin-left:4px;">${diffDisplay}</span></div>`)}
+        ${pill("🧭 判定", `<div style="margin:4px 0;"><span style="font-size:32px; font-weight:900;">${tendency}</span><br><span style="font-size:14px; font-weight:700; color:#5b6572;">${diffDisplay}</span></div>`)}
       </div>
       ${commentHtml}
       
