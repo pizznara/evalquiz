@@ -1,7 +1,7 @@
 const DATA_DIR = "../data/";
 const MANIFEST_URL = DATA_DIR + "manifest.json";
 
-// 精度スコアが90点以上の時のみ表示される特別なコメント
+// 精度スコアに応じた特別なコメント（90点以上のみ）
 function getSpecialComment(score) {
   const s = parseFloat(score);
   if (s >= 99) return "将棋の神";
@@ -33,7 +33,7 @@ async function loadQuestions(seed = Date.now()) {
       const j = Math.floor(rnd() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.slice(0, 8); // 8問
+    return shuffled.slice(0, 8);
   } catch (e) { throw e; }
 }
 
@@ -106,18 +106,20 @@ function renderResult(questions, answers) {
   const avgDiff = results.reduce((s, r) => s + r.rawDiff, 0) / questions.length;
   const avgWeightedAbsDiff = results.reduce((s, r) => s + r.weightedAbsDiff, 0) / questions.length;
   const score = Math.max(0, 100 - (avgWeightedAbsDiff / 20)).toFixed(1);
-  const diffDisplay = avgDiff > 0 ? `+${avgDiff.toFixed(0)}` : avgDiff.toFixed(0);
+  
+  // 「平均±数値」の形式にする
+  const diffSign = avgDiff >= 0 ? "+" : "";
+  const diffDisplay = `平均${diffSign}${avgDiff.toFixed(0)}`;
 
   let tendency = "";
   if (Math.abs(avgDiff) <= 300) tendency = "フラット";
   else if (avgDiff > 300) tendency = avgDiff > 1000 ? "超楽観派" : "楽観派";
   else tendency = avgDiff < -1000 ? "超悲観派" : "悲観派";
 
-  // 特別コメント（90点以上の時だけ表示）
   const specialMsg = getSpecialComment(score);
   const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;">💬 ${specialMsg}</div>` : "";
 
-  const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} (平均ズレ${diffDisplay})\n精度スコア: ${score}点\n#将棋 #形勢判断診断`;
+  const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} (${diffDisplay})\n精度スコア: ${score}点\n#将棋 #形勢判断診断`;
   const shareText = encodeURIComponent(shareContent);
 
   app.innerHTML = `
@@ -125,7 +127,7 @@ function renderResult(questions, answers) {
       <div style="font-size:35px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
         ${pill("🎯 精度スコア", `${score} <span style="font-size:14px; font-weight:700;">点</span>`)}
-        ${pill("🧭 判定", `${tendency} <span style="font-size:14px; font-weight:700;">(${diffDisplay})</span>`)}
+        ${pill("🧭 判定", `${tendency} <span style="font-size:12px; font-weight:700;"><br>(${diffDisplay})</span>`)}
       </div>
       ${commentHtml}
       
@@ -151,10 +153,15 @@ function renderResult(questions, answers) {
     const aiPos = ((r.ai + 3000) / 6000) * 100;
     const userPos = ((r.user + 3000) / 6000) * 100;
     
-    // 悲観側なら青、楽観側なら赤
     const barStart = Math.min(aiPos, userPos);
     const barWidth = Math.abs(aiPos - userPos);
     const barColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
+
+    // 1000ごとのメモリ(Ticks)の生成
+    const ticks = [-2000, -1000, 0, 1000, 2000].map(v => {
+      const pos = ((v + 3000) / 6000) * 100;
+      return `<div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#d1d5db; z-index:1;"></div>`;
+    }).join("");
 
     const item = document.createElement("div");
     item.style.cssText = `margin-bottom:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #eee;display:flex;gap:12px;align-items:center;`;
@@ -164,6 +171,7 @@ function renderResult(questions, answers) {
         <div style="font-size:12px; font-weight:700; margin-bottom:8px;">第${i+1}問 <span style="color:#1f2328; font-weight:900;">(正解: ${r.ai > 0 ? '+':''}${r.ai})</span></div>
         
         <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative; margin:12px 0;">
+          ${ticks}
           <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${barColor}; opacity:0.35; border-radius:4px;"></div>
           <div style="position:absolute; left:${aiPos}%; width:5px; height:16px; top:-4px; background:#1f2328; border-radius:2px; transform:translateX(-50%); z-index:3;"></div>
           <div style="position:absolute; left:${userPos}%; width:2px; height:12px; top:-2px; background:#1f2328; transform:translateX(-50%); z-index:4;"></div>
