@@ -125,8 +125,8 @@ function renderResult(questions, answers) {
     <div style="text-align:left;">
       <div style="font-size:35px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
-        ${pill("🎯 精度スコア", `<div style="margin:4px 0;"><span style="font-size:32px; font-weight:900;">${score}</span> <span style="font-size:14px; font-weight:700;">点</span></div>`)}
-        ${pill("🧭 判定", `<div style="margin:4px 0;"><span style="font-size:32px; font-weight:900;">${tendency}</span><br><span style="font-size:14px; font-weight:700; color:#5b6572;">${diffDisplay}</span></div>`)}
+        ${pill("🎯 精度スコア", `<div style="margin:4px 0;"><span style="font-size:32px; font-weight:900; font-variant-numeric: tabular-nums;">${score}</span> <span style="font-size:14px; font-weight:700;">点</span></div>`)}
+        ${pill("🧭 判定", `<div style="margin:4px 0;"><span style="font-size:26px; font-weight:900;">${tendency}</span><br><span style="font-size:14px; font-weight:700; color:#5b6572;">${diffDisplay}</span></div>`)}
       </div>
       ${commentHtml}
       
@@ -156,13 +156,11 @@ function renderResult(questions, answers) {
     const barWidth = Math.abs(aiPos - userPos);
     const zoneColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
 
-    // 誤差に応じたテキスト
     let feedback = "";
     const absDiff = Math.abs(r.rawDiff);
     if (absDiff === 0) feedback = '<span style="color:#f39c12; margin-left:8px;">★ピタリ！</span>';
     else if (absDiff <= 100) feedback = '<span style="color:#27ae60; margin-left:8px;">👍いいね！</span>';
 
-    // 1000ごとのメモリと数値（見やすさ最優先）
     const tickValues = [-2000, -1000, 0, 1000, 2000];
     const ticks = tickValues.map(v => {
       const pos = ((v + 3000) / 6000) * 100;
