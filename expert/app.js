@@ -135,7 +135,7 @@ function renderResult(questions, answers) {
   const diffDisplay = `(平均${diffSign}${avgDiff.toFixed(0)})`;
 
   let tendency = "";
-  if (Math.abs(avgDiff) <= 300) tendency = "フラット";
+  if (Math.abs(avgDiff) <= 300) tendency = "バランス型";
   else if (avgDiff > 300) tendency = avgDiff > 1000 ? "超楽観派" : "楽観派";
   else tendency = avgDiff < -1000 ? "超悲観派" : "悲観派";
 
