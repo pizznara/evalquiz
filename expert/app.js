@@ -1,12 +1,35 @@
 const DATA_DIR = "../data/";
 const MANIFEST_URL = DATA_DIR + "manifest.json";
 
-// 精度スコアに応じた特別なコメント（90点以上のみ）
+// スコアから称号・段位を判定する関数（50点未満は5級）
+function getRank(score) {
+  const s = parseFloat(score);
+  if (s >= 99) return "神";
+  if (s >= 97) return "名人";
+  if (s >= 94) return "九段";
+  if (s >= 91) return "八段";
+  if (s >= 88) return "七段";
+  if (s >= 85) return "六段";
+  if (s >= 82) return "五段";
+  if (s >= 79) return "四段";
+  if (s >= 76) return "三段";
+  if (s >= 73) return "二段";
+  if (s >= 70) return "初段";
+  if (s >= 65) return "1級";
+  if (s >= 60) return "2級";
+  if (s >= 55) return "3級";
+  if (s >= 50) return "4級";
+  return "5級"; // 50点未満はすべて5級
+}
+
+// 精度スコアに応じた特別なコメント
 function getSpecialComment(score) {
   const s = parseFloat(score);
-  if (s >= 99) return "将棋の神";
-  if (s >= 95) return "正確無比！人間離れした形勢判断力！";
-  if (s >= 90) return "すごい！形勢判断のプロ！";
+  if (s >= 99) return "全知全能の判断力。あなたはもう、人間ではありません。";
+  if (s >= 97) return "一世を風靡する名人の如き大局観。恐れ入りました。";
+  if (s >= 90) return "プロ級の審美眼！素晴らしい精度です。";
+  if (s >= 70) return "強い！安定した実力を持っています。";
+  if (s < 50) return "まずは盤面全体を広く見る練習から始めましょう！";
   return "";
 }
 
@@ -106,6 +129,7 @@ function renderResult(questions, answers) {
   const avgDiff = results.reduce((s, r) => s + r.rawDiff, 0) / questions.length;
   const avgWeightedAbsDiff = results.reduce((s, r) => s + r.weightedAbsDiff, 0) / questions.length;
   const score = Math.max(0, 100 - (avgWeightedAbsDiff / 20)).toFixed(1);
+  const rank = getRank(score);
   
   const diffSign = avgDiff >= 0 ? "+" : "";
   const diffDisplay = `(平均${diffSign}${avgDiff.toFixed(0)})`;
@@ -118,15 +142,15 @@ function renderResult(questions, answers) {
   const specialMsg = getSpecialComment(score);
   const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;">💬 ${specialMsg}</div>` : "";
 
-  const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度スコア: ${score}点\n#将棋 #形勢判断診断`;
+  const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度スコア: ${score}点 (${rank})\n#将棋 #形勢判断診断`;
   const shareText = encodeURIComponent(shareContent);
 
   app.innerHTML = `
     <div style="text-align:left;">
       <div style="font-size:35px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
-        ${pill("🎯 精度スコア", `<div style="margin:4px 0;"><span style="font-size:32px; font-weight:900; font-variant-numeric: tabular-nums;">${score}</span> <span style="font-size:14px; font-weight:700;">点</span></div>`)}
-        ${pill("🧭 判定", `<div style="margin:4px 0;"><span style="font-size:26px; font-weight:900;">${tendency}</span><br><span style="font-size:14px; font-weight:700; color:#5b6572;">${diffDisplay}</span></div>`)}
+        ${pill("🎯 精度 / 段位", `<div style="margin:4px 0;"><span style="font-size:24px; font-weight:900;">${score}</span><span style="font-size:16px; font-weight:700; color:#8b93a1; margin:0 4px;">/</span><span style="font-size:20px; font-weight:900; color:#e85b5b;">${rank}</span></div>`)}
+        ${pill("🧭 判定", `<div style="margin:4px 0;"><span style="font-size:24px; font-weight:900;">${tendency}</span><br><span style="font-size:12px; font-weight:700; color:#5b6572;">${diffDisplay}</span></div>`)}
       </div>
       ${commentHtml}
       
@@ -144,74 +168,48 @@ function renderResult(questions, answers) {
     </div>
   `;
 
+  // --- 各問分析部分は維持 ---
   results.forEach((r, i) => {
     const q = questions[i];
     const thumbImgPath = DATA_DIR + q.thumb;
     const largeImgPath = DATA_DIR + q.large;
-    
     const aiPos = ((r.ai + 3000) / 6000) * 100;
     const userPos = ((r.user + 3000) / 6000) * 100;
-    
     const barStart = Math.min(aiPos, userPos);
     const barWidth = Math.abs(aiPos - userPos);
     const zoneColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
-
     let feedback = "";
-    const absDiff = Math.abs(r.rawDiff);
-    if (absDiff === 0) feedback = '<span style="color:#f39c12; margin-left:8px;">★ピタリ！</span>';
-    else if (absDiff <= 100) feedback = '<span style="color:#27ae60; margin-left:8px;">👍いいね！</span>';
-
+    if (Math.abs(r.rawDiff) === 0) feedback = '<span style="color:#f39c12; margin-left:8px;">★ピタリ！</span>';
+    else if (Math.abs(r.rawDiff) <= 100) feedback = '<span style="color:#27ae60; margin-left:8px;">👍いいね！</span>';
     const tickValues = [-2000, -1000, 0, 1000, 2000];
     const ticks = tickValues.map(v => {
       const pos = ((v + 3000) / 6000) * 100;
-      const label = (v === 0) ? "0" : (v > 0 ? `+${v}` : v);
-      return `
-        <div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#9ca3af; z-index:1;"></div>
-        <div style="position:absolute; left:${pos}%; top:8px; transform:translateX(-50%); font-size:10px; color:#374151; font-weight:800; z-index:1;">${label}</div>
-      `;
+      return `<div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#9ca3af;"></div><div style="position:absolute; left:${pos}%; top:8px; transform:translateX(-50%); font-size:10px; color:#374151; font-weight:800;">${v===0?'0':(v>0?'+'+v:v)}</div>`;
     }).join("");
-
     const item = document.createElement("div");
     item.style.cssText = `margin-bottom:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #eee;display:flex;gap:12px;align-items:center;`;
     item.innerHTML = `
-      <img src="${thumbImgPath}" onclick="this.src=this.src==='${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;transition:0.2s;">
+      <img src="${thumbImgPath}" onclick="this.src=this.src==='${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;">
       <div style="flex:1;">
         <div style="font-size:12px; font-weight:700; margin-bottom:8px;">第${i+1}問 <span style="color:#1f2328; font-weight:900;">(正解: ${r.ai > 0 ? '+':''}${r.ai})</span>${feedback}</div>
-        
         <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative; margin:15px 0 22px 0;">
           ${ticks}
           <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3; border-radius:4px;"></div>
-          <div style="position:absolute; left:${aiPos}%; width:12px; height:12px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:4; box-shadow:0 0 4px rgba(232,91,91,0.5);"></div>
+          <div style="position:absolute; left:${aiPos}%; width:12px; height:12px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:4;"></div>
           <div style="position:absolute; left:${userPos}%; width:5px; height:16px; top:-4px; background:#1f2328; border-radius:2px; transform:translateX(-50%); z-index:3;"></div>
         </div>
-
         <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700;">
-          <span>
-            <span style="color:#5b6572;">予想: ${r.user > 0 ? '+':''}${r.user}</span>
-            <span style="margin-left:8px; color:${zoneColor};">誤差: ${r.rawDiff > 0 ? '+':''}${r.rawDiff}</span>
-          </span>
+          <span>予想: ${r.user > 0 ? '+':''}${r.user} <span style="margin-left:8px; color:${zoneColor};">誤差: ${r.rawDiff > 0 ? '+':''}${r.rawDiff}</span></span>
         </div>
       </div>`;
     document.getElementById("details").appendChild(item);
   });
 }
 
-const sendHeight = () => {
-    const height = document.documentElement.scrollHeight;
-    window.parent.postMessage({ type: 'resize', height: height }, '*');
-};
-
+const sendHeight = () => { window.parent.postMessage({ type: 'resize', height: document.documentElement.scrollHeight }, '*'); };
 window.onload = () => {
-    loadQuestions().then(renderQuiz).catch(err => {
-        document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
-    });
+    loadQuestions().then(renderQuiz).catch(err => { document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`; });
     sendHeight();
-    const observer = new MutationObserver(() => {
-        sendHeight();
-        document.querySelectorAll('#app img').forEach(img => {
-            if (!img.complete) img.onload = sendHeight;
-        });
-    });
+    const observer = new MutationObserver(sendHeight);
     observer.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('resize', sendHeight);
 };
