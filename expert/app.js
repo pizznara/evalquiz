@@ -137,7 +137,7 @@ function renderResult(questions, answers) {
 
       <div style="font-size:14px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;">
         <span>各問の分析</span>
-        <span style="color:#8b93a1;font-size:11px;">※赤太線：正解 / 黒細線：予想</span>
+        <span style="color:#8b93a1;font-size:11px;">※黒太線：正解 / 赤太線：予想</span>
       </div>
       <div id="details"></div>
       <button onclick="location.reload()" style="width:100%;padding:14px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;">もう一度挑戦する</button>
@@ -178,18 +178,20 @@ function renderResult(questions, answers) {
     item.innerHTML = `
       <img src="${thumbImgPath}" onclick="this.src=this.src==='${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;transition:0.2s;">
       <div style="flex:1;">
-        <div style="font-size:12px; font-weight:700; margin-bottom:8px;">第${i+1}問 <span style="color:#e85b5b; font-weight:900;">(正解: ${r.ai > 0 ? '+':''}${r.ai})</span>${feedback}</div>
+        <div style="font-size:12px; font-weight:700; margin-bottom:8px;">第${i+1}問 <span style="color:#1f2328; font-weight:900;">(正解: ${r.ai > 0 ? '+':''}${r.ai})</span>${feedback}</div>
         
         <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative; margin:15px 0 18px 0;">
           ${ticks}
           <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3; border-radius:4px;"></div>
-          <div style="position:absolute; left:${aiPos}%; width:5px; height:16px; top:-4px; background:#e85b5b; border-radius:2px; transform:translateX(-50%); z-index:3;"></div>
-          <div style="position:absolute; left:${userPos}%; width:2px; height:12px; top:-2px; background:#1f2328; transform:translateX(-50%); z-index:4;"></div>
+          <div style="position:absolute; left:${aiPos}%; width:5px; height:16px; top:-4px; background:#1f2328; border-radius:2px; transform:translateX(-50%); z-index:3;"></div>
+          <div style="position:absolute; left:${userPos}%; width:5px; height:16px; top:-4px; background:#e85b5b; border-radius:2px; transform:translateX(-50%); z-index:4;"></div>
         </div>
 
         <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700;">
-          <span style="color:#5b6572;">予想: ${r.user > 0 ? '+':''}${r.user}</span>
-          <span style="color:${zoneColor};">誤差: ${r.rawDiff > 0 ? '+':''}${r.rawDiff}</span>
+          <span>
+            <span style="color:#5b6572;">予想: ${r.user > 0 ? '+':''}${r.user}</span>
+            <span style="margin-left:8px; color:${zoneColor};">誤差: ${r.rawDiff > 0 ? '+':''}${r.rawDiff}</span>
+          </span>
         </div>
       </div>`;
     document.getElementById("details").appendChild(item);
