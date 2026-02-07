@@ -45,6 +45,21 @@ function mulberry32(a){
   }
 }
 
+// ★追加：ちょうどいい位置にスクロールさせる関数
+function scrollToQuizTop() {
+  const app = document.getElementById("app");
+  if (app) {
+    const rect = app.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    // appの位置から「70px」ほど上に余裕を持たせてスクロール
+    const targetY = rect.top + scrollTop - 70;
+    window.scrollTo({
+      top: targetY,
+      behavior: 'smooth'
+    });
+  }
+}
+
 async function loadQuestions(seed = Date.now()) {
   try {
     const manifest = await fetch(MANIFEST_URL).then(r => r.json());
@@ -89,8 +104,8 @@ function renderQuiz(questions) {
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
     `;
 
-    // ★重要：問題が変わった瞬間に、app要素（盤面）のトップまでスクロールさせる
-    app.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 盤面より少し上で止まるようにスクロール
+    scrollToQuizTop();
 
     const slider = document.getElementById("score-slider");
     const display = document.getElementById("val-display");
@@ -171,8 +186,7 @@ function renderResult(questions, answers) {
     </div>
   `;
   
-  // 結果画面でもトップへ
-  app.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  scrollToQuizTop();
 
   results.forEach((r, i) => {
     const q = questions[i];
@@ -211,7 +225,6 @@ function renderResult(questions, answers) {
   });
 }
 
-// 親に高さを伝える関数
 const sendHeight = () => {
     const height = document.documentElement.scrollHeight;
     window.parent.postMessage({ type: 'resize', height: height }, '*');
