@@ -220,9 +220,33 @@ function renderResult(questions, answers) {
 }
 
 const sendHeight = () => { window.parent.postMessage({ type: 'resize', height: document.documentElement.scrollHeight }, '*'); };
+// 修正後：エキスパート版 app.js の一番下
+const sendHeight = () => {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ type: 'resize', height: height }, '*');
+};
+
 window.onload = () => {
-    loadQuestions().then(renderQuiz).catch(err => { document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`; });
+    loadQuestions().then(renderQuiz).catch(err => {
+        document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
+    });
+
+    // 1. 読み込み完了時に一度送る
     sendHeight();
-    const observer = new MutationObserver(sendHeight);
+    
+    // 2. 画面の中身が変わるたびに送る
+    const observer = new MutationObserver(() => {
+        sendHeight();
+        // ★ここが重要！エキスパート版に抜けていた処理★
+        // 中に画像があれば、その画像が読み終わった時にも再計算させる
+        document.querySelectorAll('#app img').forEach(img => {
+            if (!img.complete) {
+                img.onload = sendHeight;
+            }
+        });
+    });
     observer.observe(document.body, { childList: true, subtree: true });
+
+    // 3. ウィンドウのサイズが変わった時にも対応
+    window.addEventListener('resize', sendHeight);
 };
