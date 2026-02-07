@@ -1,145 +1,114 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>形勢判断診断：エキスパートモード</title>
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Zen Maru Gothic', sans-serif;
-            background-color: transparent;
-            color: #1f2328;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            overscroll-behavior-y: none;
-        }
-        #container { 
-            width: 100%; 
-            max-width: 550px; 
-            padding: 0px; 
-            box-sizing: border-box; 
-            position: relative;
-            margin: 0 auto;
-        }
-        
-        .quiz-header { text-align: center; margin-bottom: 20px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>形勢判断診断：エキスパートモード</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: transparent;
+            color: #1f2328;
+            margin: 0;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+        #container { 
+            width: 100%; 
+            max-width: 550px; 
+            margin: 0 auto;
+        }
+        
+        .quiz-header { text-align: center; margin-bottom: 20px; }
+        .header-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 25px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid #eef0f5;
+        }
+        .header-container { margin-bottom: 20px; }
+        .sub-title { font-size: 16px; color: #666; font-weight: bold; margin-bottom: 5px; }
+        .main-title {
+            font-size: 26px; font-weight: 900; color: #fff; background: #1f2328;
+            padding: 10px 30px; border-radius: 50px; border-bottom: 4px solid #000;
+            display: inline-block;
+        }
+        .badge {
+            display: inline-block;
+            background: #1f2328;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.6; margin: 0; }
 
-        .header-card {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 25px 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border: 1px solid #eef0f5;
-            position: relative; 
-            z-index: 1;
-        }
+        .rule {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid #eef0f5;
+        }
+        .rule .title { font-weight: 900; color: #1f2328; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+        .rule ul { margin: 0; padding: 0; list-style: none; font-size: 13px; color: #5b6572; line-height: 1.5; }
+        .rule li { position: relative; padding-left: 18px; margin-bottom: 6px; }
+        .rule li::before { content: "•"; position: absolute; left: 0; color: #1f2328; font-weight: bold; }
 
-        .badge {
-            display: inline-block;
-            background: #1f2328;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 900;
-            color: #ffffff;
-            margin-bottom: 20px;
-            border: 1px solid #1f2328;
-        }
-
-        .intro-text { color: #5b6572; font-size: 14px; line-height: 1.6; margin: 0; }
-
-        .rule {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 20px;
-            text-align: left;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border: 1px solid #eef0f5;
-        }
-        .rule .title { font-weight: 900; color: #1f2328; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 6px; }
-        .rule ul { margin: 0; padding: 0; list-style: none; font-size: 13px; color: #5b6572; line-height: 1.5; }
-        .rule li { position: relative; padding-left: 18px; margin-bottom: 6px; }
-        .rule li::before { content: "•"; position: absolute; left: 0; color: #1f2328; font-weight: bold; }
-        .rule b { color: #1f2328; font-weight: 900; }
-
-        #app {
-            background: #ffffff; border-radius: 24px; padding: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center; min-height: 200px;
-            margin-bottom: 40px;
-        }
-        .loading { padding: 50px 0; color: #8b93a1; font-size: 14px; }
-        button { font-family: 'Zen Maru Gothic', sans-serif; cursor: pointer; transition: all 0.2s ease; }
-
-        /* タイトル回り */
-        .header-container { margin-bottom: 20px; text-align: center; }
-        .sub-title { font-size: 16px; color: #666; font-weight: bold; margin-bottom: 5px; }
-        .main-title-link { text-decoration: none; display: inline-block; transition: transform 0.2s; }
-        .main-title-link:hover { transform: translateY(-2px); }
-        .main-title {
-            font-size: 30px; font-weight: 900; color: #fff; background: #1f2328;
-            padding: 10px 30px; border-radius: 50px; border-bottom: 4px solid #000;
-        }
-
-        /* スライダーのカスタマイズ */
-        input[type="range"] {
-            -webkit-appearance: none;
-            background: #e1e4e8;
-            border-radius: 10px;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #1f2328;
-            border-radius: 50%;
-            border: 3px solid #fff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        /* スマホでの調整 */
-        @media (max-width: 480px) {
-            .main-title { font-size: 24px; }
-            #app, .header-card, .rule { border-radius: 12px; }
-        }
-    </style>
+        #app {
+            background: #ffffff; 
+            border-radius: 24px; 
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
+            text-align: center; 
+            min-height: 200px;
+            margin-bottom: 40px;
+            border: 1px solid #eef0f5;
+        }
+        .loading { padding: 50px 0; color: #8b93a1; font-size: 14px; }
+        
+        @media (max-width: 480px) {
+            .main-title { font-size: 22px; padding: 8px 20px; }
+            #app, .header-card, .rule { border-radius: 16px; padding: 15px; }
+        }
+    </style>
 </head>
 <body>
 <div id="container">
-    <header class="quiz-header">
-        <div class="header-card">
-            <div class="header-container">
-                <div class="sub-title">評価値を当てろ！</div>
-                <a href="../index.html" class="main-title-link">
-                    <div class="main-title">形勢判断診断</div>
-                </a>
-            </div>
-            <div class="badge">エキスパートモード</div>
-            <p class="intro-text">
-                8問の局面のAIの評価値をズバリ予想してください。<br>
-                あなたの形勢判断能力を100点満点で測定します。
-            </p>
-        </div>
-    </header>
+    <header class="quiz-header">
+        <div class="header-card">
+            <div class="header-container">
+                <div class="sub-title">評価値を当てろ！</div>
+                <div class="main-title">形勢判断診断</div>
+            </div>
+            <div class="badge">エキスパートモード</div>
+            <p class="intro-text">
+                8問の局面のAIの評価値をズバリ予想してください。<br>
+                あなたの形勢判断能力を100点満点で測定します。
+            </p>
+        </div>
+    </header>
 
-    <section id="rules-section" class="rule">
-        <div class="title">📘遊び方</div>
-        <ul>
-            <li>問題は全部で8問(ランダムで出題されます)。先手視点の評価値を予想し、スライダーを使って解答してください。全て先手番です。</li>
-            <li>解答の傾向を分析し、超悲観派〜超楽観派の7段階で判定します。</li>
-            <li>評価値の算出には「水匠5」を使用し、約5億ノード読ませた時点での評価値を採用しています。</li>
-        </ul>
-    </section>
+    <section id="rules-section" class="rule">
+        <div class="title">📘遊び方</div>
+        <ul>
+            <li>問題は全部で8問(ランダムで出題されます)。先手視点の評価値を予想し、スライダーを使って解答してください。全て先手番です。</li>
+            <li>解答の傾向を分析し、超悲観派〜超楽観派の7段階で判定します。</li>
+            <li>評価値の算出には「水匠5」を使用し、約5億ノード読ませた時点での評価値を採用しています。</li>
+        </ul>
+    </section>
 
-    <div id="app">
-        <div class="loading">エキスパート問題 準備中...</div>
-    </div>
+    <div id="app">
+        <div class="loading">エキスパート問題 準備中...</div>
+    </div>
 </div>
-
-<script src="app.js"></script>
+<script src="app.js" defer></script>
 </body>
 </html>
