@@ -103,7 +103,7 @@ function renderQuiz(questions) {
       answers[q.id] = parseInt(slider.value);
       if(++idx < questions.length) {
         show();
-        window.parent.postMessage({ type: 'scrollToTop' }, '*');
+        window.parent.postMessage({ type: 'scrollToQuiz' }, '*');
       } else {
         renderResult(questions, answers);
       }
