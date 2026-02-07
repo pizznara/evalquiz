@@ -1,7 +1,6 @@
 const DATA_DIR = "../data/";
 const MANIFEST_URL = DATA_DIR + "manifest.json";
 
-// スコアから称号・段位を判定する関数
 function getRank(score) {
   const s = parseFloat(score);
   if (s >= 99) return "神";
@@ -69,7 +68,7 @@ function renderQuiz(questions) {
   const show = () => {
     const q = questions[idx];
     app.innerHTML = `
-      <div id="scroll-target" style="height: 10px; margin-top: -40px;"></div>
+      <div id="scroll-anchor" style="height:50px; margin-bottom:-20px;"></div>
       <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">問題 ${idx + 1} / ${questions.length}</div>
       <img src="${DATA_DIR + q.large}" style="max-width:100%; max-height:450px; width:auto; display:block; margin: 0 auto 15px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
       
@@ -90,10 +89,13 @@ function renderQuiz(questions) {
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
     `;
 
-    // 2問目以降で親を動かす
+    // 遊び方（rules-section）を消すのではなく、単純に隠して高さを詰める
+    const rules = document.getElementById('rules-section');
+    if (rules) rules.style.display = 'none';
+
+    // 2問目以降なら、親に「上に戻れ」と命令する
     if (idx > 0) {
-        // WordPress側に「上に戻れ」と命令する
-        window.parent.postMessage({ type: 'scrollToTop' }, '*');
+      window.parent.postMessage({ type: 'scrollToTop' }, '*');
     }
 
     const slider = document.getElementById("score-slider");
@@ -120,12 +122,7 @@ function renderQuiz(questions) {
 }
 
 function renderResult(questions, answers) {
-  // 結果画面ではルールを消す
-  const rules = document.getElementById('rules-section');
-  if (rules) rules.style.display = 'none';
-
   const app = document.getElementById("app");
-  
   const results = questions.map(q => {
     const user = answers[q.id];
     const ai = q.aiCp;
@@ -169,7 +166,6 @@ function renderResult(questions, answers) {
       ${commentHtml}
       
       <a href="https://x.com/intent/tweet?text=${shareText}%0Ahttps://shogicobin.com/evaluation-quiz" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;font-size:16px;">
-        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
         結果をXでポストする
       </a>
       <div id="details"></div>
@@ -182,34 +178,29 @@ function renderResult(questions, answers) {
   results.forEach((r, i) => {
     const q = questions[i];
     const thumbImgPath = DATA_DIR + q.thumb;
-    const largeImgPath = DATA_DIR + q.large;
     const aiPos = ((r.ai + 3000) / 6000) * 100;
     const userPos = ((r.user + 3000) / 6000) * 100;
     const barStart = Math.min(aiPos, userPos);
     const barWidth = Math.abs(aiPos - userPos);
     const zoneColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
     
-    let feedback = "";
-    if (Math.abs(r.rawDiff) === 0) feedback = '<span style="color:#f39c12; margin-left:8px;">★ピタリ！</span>';
-    else if (Math.abs(r.rawDiff) <= 100) feedback = '<span style="color:#27ae60; margin-left:8px;">👍いいね！</span>';
-    
     const tickValues = [-2000, -1000, 0, 1000, 2000];
     const ticks = tickValues.map(v => {
       const pos = ((v + 3000) / 6000) * 100;
-      return `<div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#9ca3af;"></div><div style="position:absolute; left:${pos}%; top:8px; transform:translateX(-50%); font-size:10px; color:#374151; font-weight:800;">${v===0?'0':(v>0?'+'+v:v)}</div>`;
+      return `<div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#9ca3af;"></div>`;
     }).join("");
 
     const item = document.createElement("div");
     item.style.cssText = `margin-bottom:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #eee;display:flex;gap:12px;align-items:center;`;
     item.innerHTML = `
-      <img src="${thumbImgPath}" onclick="this.src=this.src==='${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;">
+      <img src="${thumbImgPath}" style="width:80px;border-radius:8px;">
       <div style="flex:1;">
-        <div style="font-size:14px; font-weight:700; margin-bottom:8px;">第${i+1}問 <span style="color:#1f2328; font-weight:900;">(正解: ${r.ai > 0 ? '+':''}${r.ai})</span>${feedback}</div>
-        <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative; margin:15px 0 25px 0;">
+        <div style="font-size:14px; font-weight:700; margin-bottom:8px;">第${i+1}問 (正解: ${r.ai > 0 ? '+':''}${r.ai})</div>
+        <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative;">
           ${ticks}
-          <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3; border-radius:4px;"></div>
-          <div style="position:absolute; left:${userPos}%; width:12px; height:12px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:4;"></div>
-          <div style="position:absolute; left:${aiPos}%; width:5px; height:16px; top:-4px; background:#1f2328; border-radius:2px; transform:translateX(-50%); z-index:3;"></div>
+          <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3;"></div>
+          <div style="position:absolute; left:${userPos}%; width:10px; height:10px; top:-1px; background:#e85b5b; border-radius:50%; transform:translateX(-50%);"></div>
+          <div style="position:absolute; left:${aiPos}%; width:4px; height:14px; top:-3px; background:#1f2328; border-radius:2px; transform:translateX(-50%);"></div>
         </div>
       </div>`;
     document.getElementById("details").appendChild(item);
@@ -225,16 +216,7 @@ window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
-
     sendHeight();
-    const observer = new MutationObserver(() => {
-        sendHeight();
-        document.querySelectorAll('#app img').forEach(img => {
-            if (!img.complete) {
-                img.onload = sendHeight;
-            }
-        });
-    });
+    const observer = new MutationObserver(sendHeight);
     observer.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('resize', sendHeight);
 };
