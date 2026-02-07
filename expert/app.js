@@ -134,10 +134,16 @@ function renderResult(questions, answers) {
   const diffSign = avgDiff >= 0 ? "+" : "";
   const diffDisplay = `(平均${diffSign}${avgDiff.toFixed(0)})`;
 
+  // 判定ロジックのアップデート
   let tendency = "";
-  if (Math.abs(avgDiff) <= 300) tendency = "フラット";
-  else if (avgDiff > 300) tendency = avgDiff > 1000 ? "超楽観派" : "楽観派";
-  else tendency = avgDiff < -1000 ? "超悲観派" : "悲観派";
+  const ad = avgDiff;
+  if (ad > 1000) tendency = "超楽観派";
+  else if (ad > 400) tendency = "楽観派";
+  else if (ad > 200) tendency = "やや楽観派";
+  else if (ad >= -200) tendency = "フラット";
+  else if (ad >= -400) tendency = "やや悲観派";
+  else if (ad >= -1000) tendency = "悲観派";
+  else tendency = "超悲観派";
 
   const specialMsg = getSpecialComment(score);
   const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;font-size:15px;">💬 ${specialMsg}</div>` : "";
