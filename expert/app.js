@@ -168,6 +168,7 @@ function renderResult(questions, answers) {
   results.forEach((r, i) => {
     const q = questions[i];
     const thumbImgPath = DATA_DIR + q.thumb;
+    const largeImgPath = DATA_DIR + q.large;
     const aiPos = ((r.ai + 3000) / 6000) * 100;
     const userPos = ((r.user + 3000) / 6000) * 100;
     const barStart = Math.min(aiPos, userPos);
@@ -175,16 +176,33 @@ function renderResult(questions, answers) {
     const zoneColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
     const feedback = Math.abs(r.rawDiff) <= 100 ? '<span style="color:#27ae60; font-size:10px; margin-left:5px;">👍</span>' : '';
 
+    // 1000刻みの目盛り生成
+    const tickValues = [-2000, -1000, 0, 1000, 2000];
+    const ticks = tickValues.map(v => {
+      const pos = ((v + 3000) / 6000) * 100;
+      return `<div style="position:absolute; left:${pos}%; width:1px; height:5px; top:0; background:#9ca3af; z-index:1;"></div>
+              <div style="position:absolute; left:${pos}%; top:8px; transform:translateX(-50%); font-size:9px; color:#9ca3af; font-weight:700;">${v===0?'0':(v>0?'+'+v:v)}</div>`;
+    }).join("");
+
     const item = document.createElement("div");
-    item.style.cssText = `margin-bottom:12px;padding:10px;border-radius:12px;background:#fff;border:1px solid #eee;display:flex;gap:10px;align-items:center;`;
+    item.style.cssText = `margin-bottom:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #eee;display:flex;gap:12px;align-items:center;`;
     item.innerHTML = `
-      <img src="${thumbImgPath}" style="width:70px;border-radius:6px;" onload="sendHeight()">
+      <div style="flex-shrink:0;">
+        <img src="${thumbImgPath}" 
+             onclick="this.src=this.src==='${window.location.origin}/${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}'; this.style.width=this.style.width==='70px'?'180px':'70px';" 
+             style="width:70px; border-radius:8px; cursor:zoom-in; transition:width 0.2s ease-out;"
+             onload="sendHeight()">
+      </div>
       <div style="flex:1;">
         <div style="font-size:12px; font-weight:700; margin-bottom:5px;">問${i+1} (正解: ${r.ai > 0 ? '+':''}${r.ai})${feedback}</div>
-        <div style="height:6px; background:#f0f0f5; border-radius:3px; position:relative;">
+        <div style="height:6px; background:#f0f0f5; border-radius:3px; position:relative; margin-bottom:20px; margin-top:5px;">
+          ${ticks}
           <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3;"></div>
-          <div style="position:absolute; left:${userPos}%; width:10px; height:10px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:2;"></div>
-          <div style="position:absolute; left:${aiPos}%; width:3px; height:12px; top:-3px; background:#1f2328; border-radius:1px; transform:translateX(-50%); z-index:1;"></div>
+          <div style="position:absolute; left:${userPos}%; width:10px; height:10px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:4;"></div>
+          <div style="position:absolute; left:${aiPos}%; width:3px; height:12px; top:-3px; background:#1f2328; border-radius:1px; transform:translateX(-50%); z-index:3;"></div>
+        </div>
+        <div style="font-size:11px; color:#5b6572; font-weight:700; margin-top:5px;">
+          あなたの予想: ${r.user > 0 ? '+':''}${r.user} / 誤差: ${r.rawDiff > 0 ? '+':''}${r.rawDiff}
         </div>
       </div>`;
     document.getElementById("details").appendChild(item);
