@@ -31,12 +31,12 @@ function getSpecialComment(score) {
   return "";
 }
 
-// スマホで改行されないよう、フォントサイズ調整と nowrap を追加
+// スマホで「〇段」が改行されないよう nowrap と inline-block を徹底
 function pill(label, value){
   return `
-    <div style="padding:10px 5px;border-radius:18px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;">
-      <div style="font-size:12px;color:#5b6572;font-weight:700;">${label}</div>
-      <div style="margin-top:4px;color:#1f2328;line-height:1.2;white-space:nowrap;">${value}</div>
+    <div style="padding:10px 4px;border-radius:18px;background:#f7f8fb;border:1px solid #eef0f5;text-align:center;">
+      <div style="font-size:11px;color:#5b6572;font-weight:700;margin-bottom:2px;">${label}</div>
+      <div style="color:#1f2328;line-height:1.2;white-space:nowrap;">${value}</div>
     </div>`;
 }
 
@@ -73,8 +73,8 @@ function renderQuiz(questions) {
   const show = () => {
     const q = questions[idx];
     app.innerHTML = `
-      <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">問題 ${idx + 1} / ${questions.length}</div>
-      <img src="${DATA_DIR + q.large}" style="max-width:100%; max-height:450px; width:auto; display:block; margin: 0 auto 15px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
+      <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;text-align:center;">問題 ${idx + 1} / ${questions.length}</div>
+      <img src="${DATA_DIR + q.large}" style="max-width:100%; max-height:420px; width:auto; display:block; margin: 0 auto 15px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
       
       <div style="text-align:center; margin-bottom:20px; background:#fcfcfd; padding:20px; border-radius:16px; border:1px solid #f0f0f5;">
         <div style="font-size:14px;color:#5b6572;font-weight:700;margin-bottom:10px;">あなたの形勢判断（先手番）</div>
@@ -84,13 +84,13 @@ function renderQuiz(questions) {
           style="width: 100%; height: 12px; cursor: pointer; touch-action: none; margin: 10px 0;">
         
         <div style="display:flex; justify-content:space-between; font-size:11px; color:#8b93a1; font-weight:700;">
-          <span>後手有利 (-3000)</span>
-          <span>先手有利 (+3000)</span>
+          <span style="color:#2c49a8;">後手有利 (-3000)</span>
+          <span style="color:#e85b5b;">先手有利 (+3000)</span>
         </div>
       </div>
 
       <button id="submit-btn" style="width:100%; padding:18px; background:#1f2328; color:#fff; border:none; border-radius:14px; font-weight:900; font-size:18px; cursor:pointer;">決定</button>
-      <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
+      <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;width:100%;">← 前の問題に戻る</button>
     `;
 
     const slider = document.getElementById("score-slider");
@@ -109,7 +109,7 @@ function renderQuiz(questions) {
         renderResult(questions, answers);
       }
     };
-    document.getElementById("prevBtn").onclick = () => { idx--; show(); };
+    document.getElementById("prevBtn").onclick = () => { if(idx > 0) { idx--; show(); } };
   };
   show();
 }
@@ -144,23 +144,27 @@ function renderResult(questions, answers) {
   else tendency = "超悲観派";
 
   const specialMsg = getSpecialComment(score);
-  const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;font-size:14px;">💬 ${specialMsg}</div>` : "";
+  const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;font-size:13px;line-height:1.4;">💬 ${specialMsg}</div>` : "";
 
   const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度: ${score}点 (${rank})\n #形勢判断診断`;
   const shareText = encodeURIComponent(shareContent);
 
+  // 精度と段位をスマホでも一行で表示するためのHTML
+  const scoreValueHtml = `
+    <span style="display:inline-block;vertical-align:middle;">
+      <span style="font-size:18px;font-weight:900;">${score}</span>
+      <span style="font-size:12px;font-weight:700;color:#8b93a1;margin:0 1px;">/</span>
+      <span style="font-size:18px;font-weight:900;color:#e85b5b;">${rank}</span>
+    </span>`;
+
+  const tendencyValueHtml = `<span style="font-size:18px;font-weight:900;">${tendency}</span>`;
+
   app.innerHTML = `
     <div style="text-align:left;">
-      <div style="font-size:28px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px;">
-        ${pill("🎯 精度 / 段位", `
-          <span style="font-size:20px; font-weight:900;">${score}</span>
-          <span style="font-size:14px; font-weight:700; color:#8b93a1; margin:0 2px;">/</span>
-          <span style="font-size:20px; font-weight:900; color:#e85b5b;">${rank}</span>
-        `)}
-        ${pill("🧭 判定", `
-          <span style="font-size:20px; font-weight:900;">${tendency}</span>
-        `)}
+      <div style="font-size:24px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
+      <div style="display:grid;grid-template-columns: 1.1fr 0.9fr;gap:6px;margin-bottom:15px;">
+        ${pill("🎯 精度 / 段位", scoreValueHtml)}
+        ${pill("🧭 判定", tendencyValueHtml)}
       </div>
       ${commentHtml}
       
@@ -172,7 +176,7 @@ function renderResult(questions, answers) {
     </div>
   `;
   
-  // 詳細リスト表示
+  // 詳細リスト
   results.forEach((r, i) => {
     const q = questions[i];
     const thumbImgPath = DATA_DIR + q.thumb;
@@ -185,15 +189,15 @@ function renderResult(questions, answers) {
     const tickValues = [-2000, -1000, 0, 1000, 2000];
     const ticks = tickValues.map(v => {
       const pos = ((v + 3000) / 6000) * 100;
-      return `<div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#9ca3af;"></div>`;
+      return `<div style="position:absolute; left:${pos}%; width:1px; height:5px; top:1px; background:#9ca3af;"></div>`;
     }).join("");
 
     const item = document.createElement("div");
     item.style.cssText = `margin-bottom:10px;padding:10px;border-radius:12px;background:#fff;border:1px solid #eee;display:flex;gap:10px;align-items:center;`;
     item.innerHTML = `
-      <img src="${thumbImgPath}" style="width:60px;border-radius:6px;">
+      <img src="${thumbImgPath}" style="width:60px;height:auto;border-radius:6px;">
       <div style="flex:1;">
-        <div style="font-size:12px; font-weight:700; margin-bottom:5px;">第${i+1}問 (正解: ${r.ai > 0 ? '+':''}${r.ai})</div>
+        <div style="font-size:12px; font-weight:700; margin-bottom:6px;">第${i+1}問 (正解: ${r.ai > 0 ? '+':''}${r.ai})</div>
         <div style="height:6px; background:#f0f0f5; border-radius:3px; position:relative;">
           ${ticks}
           <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3;"></div>
@@ -214,7 +218,7 @@ window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
-    // 高さを親に通知する機能だけは残す（表示が切れるのを防ぐため）
+    // 高さを自動で親に伝える機能だけは維持
     const observer = new MutationObserver(sendHeight);
     observer.observe(document.body, { childList: true, subtree: true });
 };
