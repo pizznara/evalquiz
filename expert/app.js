@@ -187,7 +187,14 @@ function renderResult(questions, answers) {
     const barStart = Math.min(aiPos, userPos);
     const barWidth = Math.abs(aiPos - userPos);
     const zoneColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
-    const feedback = Math.abs(r.rawDiff) <= 100 ? '<span style="color:#27ae60; font-size:10px; margin-left:5px;">👍</span>' : '';
+    
+    // リアクション文字の判定
+    let feedback = "";
+    if (r.rawDiff === 0) {
+      feedback = '<span style="color:#e67e22; font-size:11px; margin-left:8px; font-weight:900;">ピタリ！🎯</span>';
+    } else if (Math.abs(r.rawDiff) <= 100) {
+      feedback = '<span style="color:#27ae60; font-size:11px; margin-left:8px; font-weight:900;">いいね！👍</span>';
+    }
 
     const tickValues = [-2000, -1000, 0, 1000, 2000];
     const ticks = tickValues.map(v => {
@@ -205,7 +212,7 @@ function renderResult(questions, answers) {
              style="width:70px; max-width:70px; border-radius:8px; cursor:zoom-in; transition: all 0.2s ease-in-out; align-self: flex-start;"
              title="クリックで拡大">
         <div style="flex:1;">
-          <div style="font-size:12px; font-weight:700; margin-bottom:8px;">問${i+1} (AI正解: ${r.ai > 0 ? '+':''}${r.ai})${feedback}</div>
+          <div style="font-size:12px; font-weight:700; margin-bottom:8px;">問${i+1} (正解: ${r.ai > 0 ? '+':''}${r.ai})${feedback}</div>
           <div style="height:6px; background:#f0f0f5; border-radius:3px; position:relative; margin-bottom:22px; margin-top:5px;">
             ${ticks}
             <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3;"></div>
