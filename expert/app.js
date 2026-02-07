@@ -1,7 +1,7 @@
 const DATA_DIR = "../data/";
 const MANIFEST_URL = DATA_DIR + "manifest.json";
 
-// スコアから称号・段位を判定する関数（50点未満は5級）
+// スコアから称号・段位を判定する関数
 function getRank(score) {
   const s = parseFloat(score);
   if (s >= 99) return "神";
@@ -22,7 +22,6 @@ function getRank(score) {
   return "5級";
 }
 
-// 精度スコアに応じた特別なコメント
 function getSpecialComment(score) {
   const s = parseFloat(score);
   if (s >= 99) return "全知全能の大局観。あなたは神です。";
@@ -49,6 +48,7 @@ function mulberry32(a){
 async function loadQuestions(seed = Date.now()) {
   try {
     const manifest = await fetch(MANIFEST_URL).then(r => r.json());
+    // manifest.jsonからshard[0]を読み込む（標準モードと共通）
     const all = await fetch(DATA_DIR + manifest.shards[0]).then(r => r.json());
     const rnd = mulberry32(seed);
     const shuffled = [...all];
@@ -57,7 +57,10 @@ async function loadQuestions(seed = Date.now()) {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled.slice(0, 8);
-  } catch (e) { throw e; }
+  } catch (e) { 
+    console.error(e);
+    throw e; 
+  }
 }
 
 function renderQuiz(questions) {
@@ -83,7 +86,7 @@ function renderQuiz(questions) {
         </div>
       </div>
 
-      <button id="submit-btn" style="width:100%; padding:18px; background:#1f2328; color:#fff; border:none; border-radius:14px; font-weight:900; font-size:18px; cursor:pointer; transition:0.2s;">決定</button>
+      <button id="submit-btn" style="width:100%; padding:18px; background:#1f2328; color:#fff; border:none; border-radius:14px; font-weight:900; font-size:18px; cursor:pointer;">決定</button>
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
     `;
 
@@ -134,7 +137,6 @@ function renderResult(questions, answers) {
   const diffSign = avgDiff >= 0 ? "+" : "";
   const diffDisplay = `(平均${diffSign}${avgDiff.toFixed(0)})`;
 
-  // 判定ロジックのアップデート
   let tendency = "";
   const ad = avgDiff;
   if (ad > 1000) tendency = "超楽観派";
@@ -164,11 +166,6 @@ function renderResult(questions, answers) {
         <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
         結果をXでポストする
       </a>
-
-      <div style="font-size:15px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;">
-        <span>各問の分析</span>
-        <span style="color:#8b93a1;font-size:12px;">※赤丸：あなたの予想 / 黒太線：正解</span>
-      </div>
       <div id="details"></div>
       <button onclick="location.reload()" style="width:100%;padding:16px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;font-size:16px;">もう一度挑戦する</button>
     </div>
@@ -200,27 +197,18 @@ function renderResult(questions, answers) {
       <img src="${thumbImgPath}" onclick="this.src=this.src==='${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}';this.style.width=this.style.width==='80px'?'100%':'80px';" style="width:80px;border-radius:8px;cursor:pointer;">
       <div style="flex:1;">
         <div style="font-size:14px; font-weight:700; margin-bottom:8px;">第${i+1}問 <span style="color:#1f2328; font-weight:900;">(正解: ${r.ai > 0 ? '+':''}${r.ai})</span>${feedback}</div>
-        
         <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative; margin:15px 0 25px 0;">
           ${ticks}
           <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3; border-radius:4px;"></div>
           <div style="position:absolute; left:${userPos}%; width:12px; height:12px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:4;"></div>
           <div style="position:absolute; left:${aiPos}%; width:5px; height:16px; top:-4px; background:#1f2328; border-radius:2px; transform:translateX(-50%); z-index:3;"></div>
         </div>
-
-        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700;">
-          <span>
-            <span style="color:#5b6572;">あなたの予想: ${r.user > 0 ? '+':''}${r.user}</span>
-            <span style="margin-left:10px; color:${zoneColor};">誤差: ${r.rawDiff > 0 ? '+':''}${r.rawDiff}</span>
-          </span>
-        </div>
       </div>`;
     document.getElementById("details").appendChild(item);
   });
 }
 
-const sendHeight = () => { window.parent.postMessage({ type: 'resize', height: document.documentElement.scrollHeight }, '*'); };
-// 修正後：エキスパート版 app.js の一番下
+// ここが「表示されない」＆「高さが足りない」を解決する心臓部
 const sendHeight = () => {
     const height = document.documentElement.scrollHeight;
     window.parent.postMessage({ type: 'resize', height: height }, '*');
@@ -231,14 +219,10 @@ window.onload = () => {
         document.getElementById("app").innerHTML = `<div style="padding:20px; color:red;">エラー: ${err.message}</div>`;
     });
 
-    // 1. 読み込み完了時に一度送る
     sendHeight();
-    
-    // 2. 画面の中身が変わるたびに送る
     const observer = new MutationObserver(() => {
         sendHeight();
-        // ★ここが重要！エキスパート版に抜けていた処理★
-        // 中に画像があれば、その画像が読み終わった時にも再計算させる
+        // 画像が読み込まれるたびに親に高さを再通知（標準モードと同じ）
         document.querySelectorAll('#app img').forEach(img => {
             if (!img.complete) {
                 img.onload = sendHeight;
@@ -246,7 +230,4 @@ window.onload = () => {
         });
     });
     observer.observe(document.body, { childList: true, subtree: true });
-
-    // 3. ウィンドウのサイズが変わった時にも対応
-    window.addEventListener('resize', sendHeight);
 };
