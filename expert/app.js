@@ -48,6 +48,7 @@ function mulberry32(a){
 async function loadQuestions(seed = Date.now()) {
   try {
     const manifest = await fetch(MANIFEST_URL).then(r => r.json());
+    // manifest.jsonからshard[0]を読み込む（標準モードと共通）
     const all = await fetch(DATA_DIR + manifest.shards[0]).then(r => r.json());
     const rnd = mulberry32(seed);
     const shuffled = [...all];
@@ -89,9 +90,6 @@ function renderQuiz(questions) {
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
     `;
 
-    // ★重要：問題が変わった瞬間に、app要素（盤面）のトップまでスクロールさせる
-    app.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
     const slider = document.getElementById("score-slider");
     const display = document.getElementById("val-display");
     
@@ -105,6 +103,7 @@ function renderQuiz(questions) {
       answers[q.id] = parseInt(slider.value);
       if(++idx < questions.length) {
         show();
+        window.parent.postMessage({ type: 'scrollToTop' }, '*');
       } else {
         renderResult(questions, answers);
       }
@@ -116,6 +115,7 @@ function renderQuiz(questions) {
 }
 
 function renderResult(questions, answers) {
+  window.parent.postMessage({ type: 'scrollToTop' }, '*');
   const rules = document.getElementById('rules-section');
   if (rules) rules.style.display = 'none';
   const app = document.getElementById("app");
@@ -170,9 +170,6 @@ function renderResult(questions, answers) {
       <button onclick="location.reload()" style="width:100%;padding:16px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;font-size:16px;">もう一度挑戦する</button>
     </div>
   `;
-  
-  // 結果画面でもトップへ
-  app.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   results.forEach((r, i) => {
     const q = questions[i];
@@ -211,7 +208,7 @@ function renderResult(questions, answers) {
   });
 }
 
-// 親に高さを伝える関数
+// ここが「表示されない」＆「高さが足りない」を解決する心臓部
 const sendHeight = () => {
     const height = document.documentElement.scrollHeight;
     window.parent.postMessage({ type: 'resize', height: height }, '*');
@@ -225,6 +222,7 @@ window.onload = () => {
     sendHeight();
     const observer = new MutationObserver(() => {
         sendHeight();
+        // 画像が読み込まれるたびに親に高さを再通知（標準モードと同じ）
         document.querySelectorAll('#app img').forEach(img => {
             if (!img.complete) {
                 img.onload = sendHeight;
@@ -232,5 +230,4 @@ window.onload = () => {
         });
     });
     observer.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('resize', sendHeight);
 };
