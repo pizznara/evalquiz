@@ -160,7 +160,19 @@ function renderResult(questions, answers) {
       <div style="background:#f0f2f5; padding:12px 15px; border-radius:14px; font-weight:700; text-align:center; margin-bottom:20px; font-size:13px; color:#1f2328; line-height:1.4;">
         ${specialMsg}
       </div>
-      <a href="https://x.com/intent/tweet?text=${encodeURIComponent(`【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度: ${score}点 (${rank})\n #形勢判断診断\nhttps://shogicobin.com/evaluation-quiz`)}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;font-size:15px;">結果をXでポストする</a>
+      <a href="https://x.com/intent/tweet?text=${encodeURIComponent(`【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度: ${score}点 (${rank})\n #形勢判断診断\nhttps://shogicobin.com/evaluation-quiz`)}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:12px;font-size:15px;">結果をXでポストする</a>
+      
+      <div style="display:flex; justify-content:flex-end; gap:15px; margin-bottom:15px; padding-right:5px;">
+        <div style="display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:#5b6572;">
+          <div style="width:3px; height:10px; background:#1f2328; border-radius:1px;"></div>
+          <span>正解</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:#5b6572;">
+          <div style="width:8px; height:8px; background:#e85b5b; border-radius:50%;"></div>
+          <span>あなたの予想</span>
+        </div>
+      </div>
+
       <div id="details"></div>
       <button onclick="location.reload()" style="width:100%;padding:16px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;font-size:15px;font-family:inherit;">もう一度挑戦する</button>
     </div>
