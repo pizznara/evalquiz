@@ -67,7 +67,7 @@ function renderQuiz(questions) {
   const show = () => {
     const q = questions[idx];
     app.innerHTML = `
-      <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">エキスパート問題 ${idx + 1} / ${questions.length}</div>
+      <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">問題 ${idx + 1} / ${questions.length}</div>
       <img src="${DATA_DIR + q.large}" style="max-width:100%; max-height:450px; width:auto; display:block; margin: 0 auto 15px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
       
       <div style="text-align:center; margin-bottom:20px; background:#fcfcfd; padding:20px; border-radius:16px; border:1px solid #f0f0f5;">
