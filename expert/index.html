@@ -32,11 +32,19 @@
         }
         .header-container { margin-bottom: 20px; }
         .sub-title { font-size: 16px; color: #666; font-weight: bold; margin-bottom: 5px; }
+        
+        /* タイトルリンクのデザイン */
+        .title-link {
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.1s ease;
+        }
+        .title-link:active { transform: scale(0.98); }
         .main-title {
             font-size: 26px; font-weight: 900; color: #fff; background: #1f2328;
             padding: 10px 30px; border-radius: 50px; border-bottom: 4px solid #000;
-            display: inline-block;
         }
+
         .badge {
             display: inline-block;
             background: #1f2328;
@@ -86,7 +94,9 @@
         <div class="header-card">
             <div class="header-container">
                 <div class="sub-title">評価値を当てろ！</div>
-                <div class="main-title">形勢判断診断</div>
+                <a href="https://shogicobin.com/evaluation-quiz" target="_parent" class="title-link">
+                    <div class="main-title">形勢判断診断</div>
+                </a>
             </div>
             <div class="badge">エキスパートモード</div>
             <p class="intro-text">
