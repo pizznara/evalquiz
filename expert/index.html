@@ -33,13 +33,24 @@
         .header-container { margin-bottom: 20px; }
         .sub-title { font-size: 16px; color: #666; font-weight: bold; margin-bottom: 5px; }
         
-        /* タイトルリンクのデザイン */
+        /* タイトルリンクのデザインとアニメーション */
         .title-link {
             text-decoration: none;
             display: inline-block;
-            transition: transform 0.1s ease;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 弾むような動き */
         }
-        .title-link:active { transform: scale(0.98); }
+        
+        /* マウスを合わせた時：少し浮き上がって明るくなる */
+        .title-link:hover {
+            transform: translateY(-4px);
+            filter: brightness(1.1);
+        }
+
+        /* クリックした時：少し沈む */
+        .title-link:active {
+            transform: translateY(-1px);
+        }
+
         .main-title {
             font-size: 26px; font-weight: 900; color: #fff; background: #1f2328;
             padding: 10px 30px; border-radius: 50px; border-bottom: 4px solid #000;
@@ -100,7 +111,7 @@
             </div>
             <div class="badge">エキスパートモード</div>
             <p class="intro-text">
-                8問の局面のAIの評価値をズバリ予想してください。<br>
+                8問の局面のAI의 評価値をズバリ予想してください。<br>
                 あなたの形勢判断能力を100点満点で測定します。
             </p>
         </div>
