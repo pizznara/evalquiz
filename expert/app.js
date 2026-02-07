@@ -45,19 +45,6 @@ function mulberry32(a){
   }
 }
 
-// ★修正：親（WordPress）に適切な位置へのスクロールを依頼する
-function triggerParentScroll() {
-    // WordPress側のスクリプトが認識できる名前を使いつつ、
-    // "少し余裕を持った位置"として認識されるよう「scrollToQuiz」を送る
-    // もし反応しない場合は、WordPress側のJS修正が必要ですが、
-    // いったん「親に再描画と位置調整を促す」メッセージを送ります。
-    window.parent.postMessage({ type: 'scrollToQuiz' }, '*');
-    
-    // もし親が 'scrollToQuiz' を知らない場合への予備：
-    // 標準モードで動いている 'scrollToTop' も同時に送ってみますが、
-    // 直前に「遊び方」を消すことで、スクロール先を盤面に引き寄せます。
-}
-
 async function loadQuestions(seed = Date.now()) {
   try {
     const manifest = await fetch(MANIFEST_URL).then(r => r.json());
@@ -82,6 +69,7 @@ function renderQuiz(questions) {
   const show = () => {
     const q = questions[idx];
     app.innerHTML = `
+      <div id="scroll-target" style="height: 10px; margin-top: -40px;"></div>
       <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">問題 ${idx + 1} / ${questions.length}</div>
       <img src="${DATA_DIR + q.large}" style="max-width:100%; max-height:450px; width:auto; display:block; margin: 0 auto 15px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
       
@@ -102,12 +90,11 @@ function renderQuiz(questions) {
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
     `;
 
-    // ★ 遊び方のエリアを非表示にすることで、スクロール位置を物理的に盤面に近づける
-    const rules = document.getElementById('rules-section');
-    if (rules) rules.style.display = 'none';
-
-    // 親にスクロールを命令
-    triggerParentScroll();
+    // 2問目以降で親を動かす
+    if (idx > 0) {
+        // WordPress側に「上に戻れ」と命令する
+        window.parent.postMessage({ type: 'scrollToTop' }, '*');
+    }
 
     const slider = document.getElementById("score-slider");
     const display = document.getElementById("val-display");
@@ -133,6 +120,10 @@ function renderQuiz(questions) {
 }
 
 function renderResult(questions, answers) {
+  // 結果画面ではルールを消す
+  const rules = document.getElementById('rules-section');
+  if (rules) rules.style.display = 'none';
+
   const app = document.getElementById("app");
   
   const results = questions.map(q => {
@@ -186,7 +177,7 @@ function renderResult(questions, answers) {
     </div>
   `;
   
-  triggerParentScroll();
+  window.parent.postMessage({ type: 'scrollToTop' }, '*');
 
   results.forEach((r, i) => {
     const q = questions[i];
