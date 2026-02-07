@@ -1,6 +1,7 @@
 const DATA_DIR = "../data/";
 const MANIFEST_URL = DATA_DIR + "manifest.json";
 
+// スコアから称号・段位を判定
 function getRank(score) {
   const s = parseFloat(score);
   if (s >= 99) return "神";
