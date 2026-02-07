@@ -59,6 +59,11 @@ async function loadQuestions(seed = Date.now()) {
   } catch (e) { console.error(e); throw e; }
 }
 
+const sendHeight = () => {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ type: 'resize', height: height }, '*');
+};
+
 function renderQuiz(questions) {
   const app = document.getElementById("app");
   let idx = 0, answers = {};
@@ -67,7 +72,9 @@ function renderQuiz(questions) {
     const q = questions[idx];
     app.innerHTML = `
       <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;text-align:left;">問題 ${idx + 1} / ${questions.length}</div>
-      <img src="${DATA_DIR + q.large}" style="max-width:100%; max-height:400px; width:auto; display:block; margin: 0 auto 15px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
+      <img src="${DATA_DIR + q.large}" 
+           onload="sendHeight()" 
+           style="width:100%; height:auto; max-width:500px; display:block; margin: 0 auto 15px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
       
       <div style="text-align:center; margin-bottom:20px; background:#fcfcfd; padding:20px; border-radius:16px; border:1px solid #f0f0f5;">
         <div style="font-size:14px;color:#5b6572;font-weight:700;margin-bottom:10px;">あなたの形勢判断（先手番）</div>
@@ -171,7 +178,7 @@ function renderResult(questions, answers) {
     const item = document.createElement("div");
     item.style.cssText = `margin-bottom:12px;padding:10px;border-radius:12px;background:#fff;border:1px solid #eee;display:flex;gap:10px;align-items:center;`;
     item.innerHTML = `
-      <img src="${thumbImgPath}" style="width:70px;border-radius:6px;">
+      <img src="${thumbImgPath}" style="width:70px;border-radius:6px;" onload="sendHeight()">
       <div style="flex:1;">
         <div style="font-size:12px; font-weight:700; margin-bottom:5px;">問${i+1} (正解: ${r.ai > 0 ? '+':''}${r.ai})${feedback}</div>
         <div style="height:6px; background:#f0f0f5; border-radius:3px; position:relative;">
@@ -184,11 +191,6 @@ function renderResult(questions, answers) {
   });
   sendHeight();
 }
-
-const sendHeight = () => {
-    const height = document.documentElement.scrollHeight;
-    window.parent.postMessage({ type: 'resize', height: height }, '*');
-};
 
 window.onload = () => {
     loadQuestions().then(renderQuiz).catch(err => {
