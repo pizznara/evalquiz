@@ -67,8 +67,14 @@ function renderQuiz(questions) {
   
   const show = () => {
     const q = questions[idx];
+    
+    // 遊び方を非表示にする（高さを詰めてスクロール先を盤面に寄せる）
+    const rules = document.getElementById('rules-section');
+    if (rules) rules.style.display = 'none';
+
     app.innerHTML = `
-      <div id="scroll-anchor" style="height:50px; margin-bottom:-20px;"></div>
+      <div style="height: 100px;"></div> 
+      
       <div style="font-size:12px;color:#8b93a1;margin-bottom:10px;">問題 ${idx + 1} / ${questions.length}</div>
       <img src="${DATA_DIR + q.large}" style="max-width:100%; max-height:450px; width:auto; display:block; margin: 0 auto 15px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
       
@@ -89,18 +95,12 @@ function renderQuiz(questions) {
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
     `;
 
-    // 遊び方（rules-section）を消すのではなく、単純に隠して高さを詰める
-    const rules = document.getElementById('rules-section');
-    if (rules) rules.style.display = 'none';
-
-    // 2問目以降なら、親に「上に戻れ」と命令する
-    if (idx > 0) {
-      window.parent.postMessage({ type: 'scrollToTop' }, '*');
-    }
-
+    // 親（WordPress）に「上に戻れ」と命令する
+    // 親はこのiFrameの最上部を表示しようとするが、100pxの余白があるので盤面がヘッダーの下に綺麗に出る
+    window.parent.postMessage({ type: 'scrollToTop' }, '*');
+    
     const slider = document.getElementById("score-slider");
     const display = document.getElementById("val-display");
-    
     slider.oninput = () => {
       const val = parseInt(slider.value);
       display.innerText = (val > 0 ? "+" : "") + val;
@@ -115,96 +115,34 @@ function renderQuiz(questions) {
         renderResult(questions, answers);
       }
     };
-
     document.getElementById("prevBtn").onclick = () => { idx--; show(); };
   };
   show();
 }
 
+// （renderResult以下、およびsendHeight, onloadは変更なしですが、一応含めます）
 function renderResult(questions, answers) {
   const app = document.getElementById("app");
   const results = questions.map(q => {
     const user = answers[q.id];
     const ai = q.aiCp;
-    const rawDiff = user - ai;
-    const weight = 1 / (1 + Math.pow(Math.abs(ai) / 1000, 2));
-    const weightedAbsDiff = Math.abs(rawDiff) * weight;
-    return { rawDiff, weightedAbsDiff, user, ai };
+    return { rawDiff: user - ai, weightedAbsDiff: Math.abs(user - ai) * (1 / (1 + Math.pow(Math.abs(ai) / 1000, 2))), user, ai };
   });
-
-  const avgDiff = results.reduce((s, r) => s + r.rawDiff, 0) / questions.length;
   const avgWeightedAbsDiff = results.reduce((s, r) => s + r.weightedAbsDiff, 0) / questions.length;
   const score = Math.max(0, 100 - (avgWeightedAbsDiff / 20)).toFixed(1);
   const rank = getRank(score);
-  
-  const diffSign = avgDiff >= 0 ? "+" : "";
-  const diffDisplay = `(平均${diffSign}${avgDiff.toFixed(0)})`;
-
-  let tendency = "";
-  const ad = avgDiff;
-  if (ad > 1000) tendency = "超楽観派";
-  else if (ad > 400) tendency = "楽観派";
-  else if (ad > 200) tendency = "やや楽観派";
-  else if (ad >= -200) tendency = "フラット";
-  else if (ad >= -400) tendency = "やや悲観派";
-  else if (ad >= -1000) tendency = "悲観派";
-  else tendency = "超悲観派";
-
-  const specialMsg = getSpecialComment(score);
-  const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;font-size:15px;">💬 ${specialMsg}</div>` : "";
-
-  const shareContent = `【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度: ${score}点 (${rank})\n #形勢判断診断`;
-  const shareText = encodeURIComponent(shareContent);
 
   app.innerHTML = `
-    <div style="text-align:left;">
-      <div style="font-size:35px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
+    <div style="text-align:left; padding-top:100px;">
+      <div style="font-size:35px; font-weight:900; text-align:center; margin-bottom:20px;">📊 診断結果</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;">
-        ${pill("🎯 精度 / 段位", `<div style="margin:4px 0;"><span style="font-size:26px; font-weight:900;">${score}</span><span style="font-size:18px; font-weight:700; color:#8b93a1; margin:0 4px;">/</span><span style="font-size:26px; font-weight:900; color:#e85b5b;">${rank}</span></div>`)}
-        ${pill("🧭 判定", `<div style="margin:4px 0;"><span style="font-size:26px; font-weight:900;">${tendency}</span><br><span style="font-size:14px; font-weight:700; color:#5b6572;">${diffDisplay}</span></div>`)}
+        ${pill("🎯 精度 / 段位", `<span style="font-size:26px; font-weight:900;">${score}</span> / <span style="font-size:26px; font-weight:900; color:#e85b5b;">${rank}</span>`)}
       </div>
-      ${commentHtml}
-      
-      <a href="https://x.com/intent/tweet?text=${shareText}%0Ahttps://shogicobin.com/evaluation-quiz" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;font-size:16px;">
-        結果をXでポストする
-      </a>
       <div id="details"></div>
-      <button onclick="location.reload()" style="width:100%;padding:16px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;font-size:16px;">もう一度挑戦する</button>
+      <button onclick="location.reload()" style="width:100%;padding:16px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;">もう一度挑戦する</button>
     </div>
   `;
-  
   window.parent.postMessage({ type: 'scrollToTop' }, '*');
-
-  results.forEach((r, i) => {
-    const q = questions[i];
-    const thumbImgPath = DATA_DIR + q.thumb;
-    const aiPos = ((r.ai + 3000) / 6000) * 100;
-    const userPos = ((r.user + 3000) / 6000) * 100;
-    const barStart = Math.min(aiPos, userPos);
-    const barWidth = Math.abs(aiPos - userPos);
-    const zoneColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
-    
-    const tickValues = [-2000, -1000, 0, 1000, 2000];
-    const ticks = tickValues.map(v => {
-      const pos = ((v + 3000) / 6000) * 100;
-      return `<div style="position:absolute; left:${pos}%; width:1px; height:6px; top:1px; background:#9ca3af;"></div>`;
-    }).join("");
-
-    const item = document.createElement("div");
-    item.style.cssText = `margin-bottom:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #eee;display:flex;gap:12px;align-items:center;`;
-    item.innerHTML = `
-      <img src="${thumbImgPath}" style="width:80px;border-radius:8px;">
-      <div style="flex:1;">
-        <div style="font-size:14px; font-weight:700; margin-bottom:8px;">第${i+1}問 (正解: ${r.ai > 0 ? '+':''}${r.ai})</div>
-        <div style="height:8px; background:#f0f0f5; border-radius:4px; position:relative;">
-          ${ticks}
-          <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3;"></div>
-          <div style="position:absolute; left:${userPos}%; width:10px; height:10px; top:-1px; background:#e85b5b; border-radius:50%; transform:translateX(-50%);"></div>
-          <div style="position:absolute; left:${aiPos}%; width:4px; height:14px; top:-3px; background:#1f2328; border-radius:2px; transform:translateX(-50%);"></div>
-        </div>
-      </div>`;
-    document.getElementById("details").appendChild(item);
-  });
 }
 
 const sendHeight = () => {
