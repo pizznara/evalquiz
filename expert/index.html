@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>形勢判断診断：エキスパート</title>
     <style>
+        /* 基本スタイル：WordPressのテーマに干渉しにくい設定 */
         body {
             margin: 0;
             padding: 10px;
@@ -12,7 +13,6 @@
             background-color: transparent;
             color: #1f2328;
             overflow-x: hidden;
-            -webkit-text-size-adjust: 100%; /* iPhoneでの文字化け防止 */
         }
 
         #app {
@@ -20,11 +20,12 @@
             margin: 0 auto;
         }
 
+        /* ルール説明セクションのスタイル */
         #rules-section {
             background: #fff;
             border: 1px solid #eef0f5;
             border-radius: 16px;
-            padding: 15px;
+            padding: 20px;
             margin-bottom: 20px;
             font-size: 14px;
             line-height: 1.6;
@@ -34,8 +35,15 @@
             margin-top: 0;
             font-size: 18px;
             color: #1f2328;
+            text-align: center;
         }
 
+        /* 箱がはみ出さないための設定 */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* スライダーの見た目調整 */
         input[type=range] {
             -webkit-appearance: none;
             background: #eef0f5;
@@ -55,11 +63,6 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
-        /* 箱がはみ出さないための設定 */
-        * {
-            box-sizing: border-box;
-        }
-
         #prevBtn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
@@ -67,15 +70,20 @@
     </style>
 </head>
 <body>
+
     <div id="rules-section">
         <h2>📊 診断ルール</h2>
-        <p>問題は全部で8問(ランダムで出題されます)。先手視点の評価値を予想し、スライダーを使って解答してください。全て先手番です。。</p>
-        <ul style="padding-left: 20px;">
-            <li>解答の傾向を分析し、超悲観派〜超楽観派の7段階で判定します。</li>
-            <li>評価値の算出には「水匠5」を使用し、約5億ノード読ませた時点での評価値を採用しています。</li>
-        </ul>
+        <p>問題は全部で8問(ランダムで出題されます)。先手視点の評価値を予想し、スライダーを使って解答してください。全て先手番です。</p>
+        <p>解答の傾向を分析し、超悲観派〜超楽観派の7段階で判定します。</p>
+        <p>評価値の算出には「水匠5」を使用し、約5億ノード読ませた時点での評価値を採用しています。</p>
     </div>
-    <div id="app"><div style="text-align:center; padding:50px; color:#8b93a1;">読み込み中...</div></div>
+
+    <div id="app">
+        <div style="text-align:center; padding:50px; color:#8b93a1;">
+            読み込み中...
+        </div>
+    </div>
+
     <script src="js/app.js"></script>
 </body>
 </html>
