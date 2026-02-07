@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>形勢判断診断：エキスパート</title>
     <style>
-        /* 基本スタイル：WordPressのテーマに干渉しにくい設定 */
         body {
             margin: 0;
             padding: 10px;
@@ -13,6 +12,7 @@
             background-color: transparent;
             color: #1f2328;
             overflow-x: hidden;
+            -webkit-text-size-adjust: 100%; /* iPhoneでの文字化け防止 */
         }
 
         #app {
@@ -20,7 +20,6 @@
             margin: 0 auto;
         }
 
-        /* ルール説明セクションのスタイル */
         #rules-section {
             background: #fff;
             border: 1px solid #eef0f5;
@@ -37,11 +36,13 @@
             color: #1f2328;
         }
 
-        /* スライダーの見た目をスマホ向けに調整 */
         input[type=range] {
             -webkit-appearance: none;
             background: #eef0f5;
             border-radius: 10px;
+            width: 100%;
+            height: 12px;
+            margin: 10px 0;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
@@ -54,7 +55,11 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
-        /* 戻るボタンのホバー・無効化 */
+        /* 箱がはみ出さないための設定 */
+        * {
+            box-sizing: border-box;
+        }
+
         #prevBtn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
@@ -62,7 +67,6 @@
     </style>
 </head>
 <body>
-
     <div id="rules-section">
         <h2>📊 診断ルール</h2>
         <p>表示される局面の形勢をスライダーで判断してください。AI（水匠5）の評価値と比較し、あなたの「大局観」の精度と傾向を診断します。</p>
@@ -71,13 +75,7 @@
             <li>判断の偏りから「楽観・悲観」の傾向を表示。</li>
         </ul>
     </div>
-
-    <div id="app">
-        <div style="text-align:center; padding:50px; color:#8b93a1;">
-            読み込み中...
-        </div>
-    </div>
-
+    <div id="app"><div style="text-align:center; padding:50px; color:#8b93a1;">読み込み中...</div></div>
     <script src="js/app.js"></script>
 </body>
 </html>
