@@ -29,7 +29,7 @@ function getSpecialComment(score) {
   if (s >= 90) return "プロ級の形勢判断力！素晴らしい精度です。";
   if (s >= 70) return "強い！安定した実力を持っています。";
   if (s < 50) return "まずは盤面全体を広く見る練習から始めましょう！";
-  return "";
+  return "着実に実力をつけています。さらなる高みを目指しましょう！";
 }
 
 function pill(label, value){
@@ -149,16 +149,17 @@ function renderResult(questions, answers) {
   else tendency = "超悲観派";
 
   const specialMsg = getSpecialComment(score);
-  const commentHtml = specialMsg ? `<div style="background:#fff7e6;padding:12px;border-radius:12px;border:1px solid #ffe2b4;font-weight:700;text-align:center;margin-bottom:20px;font-size:14px;">💬 ${specialMsg}</div>` : "";
 
   app.innerHTML = `
     <div style="text-align:left;">
       <div style="font-size:24px; font-weight:900; text-align:center; margin-bottom:20px; color:#1f2328;">📊 診断結果</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
         ${pill("🎯 精度 / 段位", `<div style="margin:2px 0;"><span style="font-size:20px; font-weight:900;">${score}</span><span style="font-size:14px; font-weight:700; color:#8b93a1; margin:0 4px;">/</span><span style="font-size:20px; font-weight:900; color:#e85b5b;">${rank}</span></div>`)}
         ${pill("🧭 判定", `<div style="margin:2px 0;"><span style="font-size:20px; font-weight:900;">${tendency}</span><br><span style="font-size:12px; font-weight:700; color:#5b6572;">${diffDisplay}</span></div>`)}
       </div>
-      ${commentHtml}
+      <div style="background:#f0f2f5; padding:12px 15px; border-radius:14px; font-weight:700; text-align:center; margin-bottom:20px; font-size:13px; color:#1f2328; line-height:1.4;">
+        ${specialMsg}
+      </div>
       <a href="https://x.com/intent/tweet?text=${encodeURIComponent(`【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度: ${score}点 (${rank})\n #形勢判断診断\nhttps://shogicobin.com/evaluation-quiz`)}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:20px;font-size:15px;">結果をXでポストする</a>
       <div id="details"></div>
       <button onclick="location.reload()" style="width:100%;padding:16px;border-radius:12px;border:1px solid #d9dde6;background:#fff;cursor:pointer;font-weight:700;margin-top:10px;color:#1f2328;font-size:15px;font-family:inherit;">もう一度挑戦する</button>
@@ -176,7 +177,6 @@ function renderResult(questions, answers) {
     const zoneColor = r.rawDiff > 0 ? "#e85b5b" : "#2c49a8";
     const feedback = Math.abs(r.rawDiff) <= 100 ? '<span style="color:#27ae60; font-size:10px; margin-left:5px;">👍</span>' : '';
 
-    // 1000刻みの目盛り生成
     const tickValues = [-2000, -1000, 0, 1000, 2000];
     const ticks = tickValues.map(v => {
       const pos = ((v + 3000) / 6000) * 100;
@@ -185,24 +185,24 @@ function renderResult(questions, answers) {
     }).join("");
 
     const item = document.createElement("div");
-    item.style.cssText = `margin-bottom:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #eee;display:flex;gap:12px;align-items:center;`;
+    item.style.cssText = `margin-bottom:12px;padding:12px;border-radius:16px;background:#fff;border:1px solid #eee;display:flex;flex-direction:column;gap:12px;`;
     item.innerHTML = `
-      <div style="flex-shrink:0;">
+      <div style="display:flex; gap:12px; align-items:center;">
         <img src="${thumbImgPath}" 
-             onclick="this.src=this.src==='${window.location.origin}/${thumbImgPath}'?'${largeImgPath}':'${thumbImgPath}'; this.style.width=this.style.width==='70px'?'180px':'70px';" 
-             style="width:70px; border-radius:8px; cursor:zoom-in; transition:width 0.2s ease-out;"
-             onload="sendHeight()">
-      </div>
-      <div style="flex:1;">
-        <div style="font-size:12px; font-weight:700; margin-bottom:5px;">問${i+1} (正解: ${r.ai > 0 ? '+':''}${r.ai})${feedback}</div>
-        <div style="height:6px; background:#f0f0f5; border-radius:3px; position:relative; margin-bottom:20px; margin-top:5px;">
-          ${ticks}
-          <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3;"></div>
-          <div style="position:absolute; left:${userPos}%; width:10px; height:10px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:4;"></div>
-          <div style="position:absolute; left:${aiPos}%; width:3px; height:12px; top:-3px; background:#1f2328; border-radius:1px; transform:translateX(-50%); z-index:3;"></div>
-        </div>
-        <div style="font-size:11px; color:#5b6572; font-weight:700; margin-top:5px;">
-          あなたの予想: ${r.user > 0 ? '+':''}${r.user} / 誤差: ${r.rawDiff > 0 ? '+':''}${r.rawDiff}
+             onclick="const isExp = this.style.width === '100%'; this.style.width = isExp ? '70px' : '100%'; this.style.maxWidth = isExp ? '70px' : '450px'; this.src = isExp ? '${thumbImgPath}' : '${largeImgPath}';" 
+             style="width:70px; max-width:70px; border-radius:8px; cursor:zoom-in; transition: all 0.2s ease-in-out; align-self: flex-start;"
+             title="クリックで拡大">
+        <div style="flex:1;">
+          <div style="font-size:12px; font-weight:700; margin-bottom:8px;">問${i+1} (AI正解: ${r.ai > 0 ? '+':''}${r.ai})${feedback}</div>
+          <div style="height:6px; background:#f0f0f5; border-radius:3px; position:relative; margin-bottom:22px; margin-top:5px;">
+            ${ticks}
+            <div style="position:absolute; left:${barStart}%; width:${barWidth}%; height:100%; background:${zoneColor}; opacity:0.3;"></div>
+            <div style="position:absolute; left:${userPos}%; width:10px; height:10px; top:-2px; background:#e85b5b; border-radius:50%; transform:translateX(-50%); z-index:4;"></div>
+            <div style="position:absolute; left:${aiPos}%; width:3px; height:12px; top:-3px; background:#1f2328; border-radius:1px; transform:translateX(-50%); z-index:3;"></div>
+          </div>
+          <div style="font-size:11px; color:#5b6572; font-weight:700;">
+            あなたの予想: <span style="color:#e85b5b;">${r.user > 0 ? '+':''}${r.user}</span> / 誤差: <span style="color:#1f2328;">${r.rawDiff > 0 ? '+':''}${r.rawDiff}</span>
+          </div>
         </div>
       </div>`;
     document.getElementById("details").appendChild(item);
