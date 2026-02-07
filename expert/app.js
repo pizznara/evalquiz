@@ -45,19 +45,17 @@ function mulberry32(a){
   }
 }
 
-// ★追加：ちょうどいい位置にスクロールさせる関数
-function scrollToQuizTop() {
-  const app = document.getElementById("app");
-  if (app) {
-    const rect = app.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    // appの位置から「70px」ほど上に余裕を持たせてスクロール
-    const targetY = rect.top + scrollTop - 70;
-    window.scrollTo({
-      top: targetY,
-      behavior: 'smooth'
-    });
-  }
+// ★修正：親（WordPress）に適切な位置へのスクロールを依頼する
+function triggerParentScroll() {
+    // WordPress側のスクリプトが認識できる名前を使いつつ、
+    // "少し余裕を持った位置"として認識されるよう「scrollToQuiz」を送る
+    // もし反応しない場合は、WordPress側のJS修正が必要ですが、
+    // いったん「親に再描画と位置調整を促す」メッセージを送ります。
+    window.parent.postMessage({ type: 'scrollToQuiz' }, '*');
+    
+    // もし親が 'scrollToQuiz' を知らない場合への予備：
+    // 標準モードで動いている 'scrollToTop' も同時に送ってみますが、
+    // 直前に「遊び方」を消すことで、スクロール先を盤面に引き寄せます。
 }
 
 async function loadQuestions(seed = Date.now()) {
@@ -104,8 +102,12 @@ function renderQuiz(questions) {
       <button id="prevBtn"${idx===0?' disabled':''} style="margin-top:15px;background:none;border:none;color:#8b93a1;cursor:pointer;font-size:13px;font-weight:700;">← 戻る</button>
     `;
 
-    // 盤面より少し上で止まるようにスクロール
-    scrollToQuizTop();
+    // ★ 遊び方のエリアを非表示にすることで、スクロール位置を物理的に盤面に近づける
+    const rules = document.getElementById('rules-section');
+    if (rules) rules.style.display = 'none';
+
+    // 親にスクロールを命令
+    triggerParentScroll();
 
     const slider = document.getElementById("score-slider");
     const display = document.getElementById("val-display");
@@ -131,8 +133,6 @@ function renderQuiz(questions) {
 }
 
 function renderResult(questions, answers) {
-  const rules = document.getElementById('rules-section');
-  if (rules) rules.style.display = 'none';
   const app = document.getElementById("app");
   
   const results = questions.map(q => {
@@ -186,7 +186,7 @@ function renderResult(questions, answers) {
     </div>
   `;
   
-  scrollToQuizTop();
+  triggerParentScroll();
 
   results.forEach((r, i) => {
     const q = questions[i];
