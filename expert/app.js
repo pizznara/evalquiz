@@ -160,7 +160,7 @@ function renderResult(questions, answers) {
       <div style="background:#f0f2f5; padding:12px 15px; border-radius:14px; font-weight:700; text-align:center; margin-bottom:20px; font-size:13px; color:#1f2328; line-height:1.4;">
         ${specialMsg}
       </div>
-      <a href="https://x.com/intent/tweet?text=${encodeURIComponent(`【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度: ${score}点 (${rank})\n #形勢判断診断\nhttps://shogicobin.com/evaluation-quiz`)}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:12px;font-size:15px;">結果をXでポストする</a>
+      <a href="https://x.com/intent/tweet?text=${encodeURIComponent(`【形勢判断診断：エキスパート】\n判定: ${tendency} ${diffDisplay}\n精度: ${score}点 (${rank})\n#形勢判断診断\nhttps://shogicobin.com/evaluation-quiz`)}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#000;color:#fff;text-decoration:none;padding:14px;border-radius:12px;text-align:center;font-weight:700;margin-bottom:12px;font-size:15px;">結果をXでポストする</a>
       
       <div style="display:flex; justify-content:flex-end; gap:15px; margin-bottom:15px; padding-right:5px;">
         <div style="display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:#5b6572;">
